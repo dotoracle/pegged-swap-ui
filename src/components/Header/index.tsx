@@ -4,21 +4,15 @@ import { darken } from 'polished'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
-import { useShowClaimPopup, useToggleSelfClaimModal } from 'state/application/hooks'
-import { useUserHasAvailableClaim } from 'state/claim/hooks'
-import { useUserHasSubmittedClaim } from 'state/transactions/hooks'
 import { useETHBalances } from 'state/wallet/hooks'
 import styled from 'styled-components/macro'
 import Logo from '../../assets/images/logo.png'
 import LogoMobilePNG from '../../assets/images/logo-mobile.png'
 import { useActiveWeb3React } from '../../hooks/web3'
-import { ExternalLink, TYPE } from '../../theme'
-import ClaimModal from '../claim/ClaimModal'
-import { CardNoise } from '../earn/styled'
+import { ExternalLink } from '../../theme'
 import Menu from '../Menu'
 import Modal from '../Modal'
 import Row, { RowFixed } from '../Row'
-import { Dots } from '../swap/styleds'
 import Web3Status from '../Web3Status'
 import NetworkCard from './NetworkCard'
 import UniBalanceContent from './UniBalanceContent'
@@ -33,8 +27,6 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   width: 100%;
   max-width: 1280px;
   top: 0;
-  position: relative;
-  z-index: 21;
   position: relative;
 `
 
@@ -114,29 +106,6 @@ const AccountElement = styled.div<{ active: boolean }>`
 
   :focus {
     border: 1px solid blue;
-  }
-`
-
-const UNIAmount = styled(AccountElement)`
-  color: white;
-  padding: 4px 8px;
-  height: 36px;
-  font-weight: 500;
-  background-color: ${({ theme }) => theme.bg3};
-  background: radial-gradient(174.47% 188.91% at 1.84% 0%, #ff007a 0%, #2172e5 100%), #edeef2;
-`
-
-const UNIWrapper = styled.span`
-  width: fit-content;
-  position: relative;
-  cursor: pointer;
-
-  :hover {
-    opacity: 0.8;
-  }
-
-  :active {
-    opacity: 0.9;
   }
 `
 
@@ -310,20 +279,12 @@ export default function Header() {
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
 
-  const toggleClaimModal = useToggleSelfClaimModal()
-
-  const availableClaim: boolean = useUserHasAvailableClaim(account)
-
-  const { claimTxn } = useUserHasSubmittedClaim(account ?? undefined)
-
   const [showUniBalanceModal, setShowUniBalanceModal] = useState(false)
-  const showClaimPopup = useShowClaimPopup()
 
   const scrollY = useScrollPosition()
 
   return (
     <HeaderFrame showBackground={scrollY > 45}>
-      <ClaimModal />
       <Modal isOpen={showUniBalanceModal} onDismiss={() => setShowUniBalanceModal(false)}>
         <UniBalanceContent setShowUniBalanceModal={setShowUniBalanceModal} />
       </Modal>
@@ -375,22 +336,6 @@ export default function Header() {
             <HideSmall>
               <NetworkCard />
             </HideSmall>
-            {availableClaim && !showClaimPopup && (
-              <UNIWrapper onClick={toggleClaimModal}>
-                <UNIAmount active={!!account && !availableClaim} style={{ pointerEvents: 'auto' }}>
-                  <TYPE.white padding="0 2px">
-                    {claimTxn && !claimTxn?.receipt ? (
-                      <Dots>
-                        <Trans>Claiming UNI</Trans>
-                      </Dots>
-                    ) : (
-                      <Trans>Claim UNI</Trans>
-                    )}
-                  </TYPE.white>
-                </UNIAmount>
-                <CardNoise />
-              </UNIWrapper>
-            )}
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
