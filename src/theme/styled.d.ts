@@ -6,6 +6,7 @@ export interface Colors {
   white: Color
   black: Color
   pink: Color
+  pink2: Color
 
   // text
   text1: Color

@@ -37,13 +37,7 @@ const Base = styled(RebassButton)<
     pointer-events: none;
   }
 
-  will-change: transform;
-  transition: transform 450ms ease;
-  transform: perspective(1px) translateZ(0);
-
-  &:hover {
-    transform: scale(0.99);
-  }
+  transition: all 450ms ease;
 
   > * {
     user-select: none;

@@ -35,6 +35,7 @@ const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } 
 const white = '#FFFFFF'
 const black = '#000000'
 const pink = '#e2007a'
+const pink2 = '#c7006c'
 
 function colors(darkMode: boolean): Colors {
   return {
@@ -42,6 +43,7 @@ function colors(darkMode: boolean): Colors {
     white,
     black,
     pink,
+    pink2,
 
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',

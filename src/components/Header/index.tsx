@@ -36,22 +36,9 @@ const HeaderControls = styled.div`
   align-items: center;
   justify-self: flex-end;
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    flex-direction: row;
-    justify-content: space-between;
-    justify-self: center;
-    width: 100%;
-    max-width: 960px;
-    padding: 1rem;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    z-index: 99;
-    height: 72px;
-    border-radius: 12px 12px 0 0;
-    background-color: ${({ theme }) => theme.bg1};
-  `};
+  @media (min-width: 992px) {
+    margin-left: 2rem;
+  }
 `
 
 const HeaderElement = styled.div`
@@ -107,12 +94,6 @@ const AccountElement = styled.div<{ active: boolean }>`
   :focus {
     border: 1px solid blue;
   }
-`
-
-const HideSmall = styled.span`
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    display: none;
-  `};
 `
 
 const BalanceText = styled(Text)`
@@ -330,12 +311,9 @@ export default function Header() {
             <sup>↗</sup>
           </StyledExternalLink> */}
         </HeaderLinks>
-        <Menu />
         <HeaderControls>
           <HeaderElement>
-            <HideSmall>
-              <NetworkCard />
-            </HideSmall>
+            {/* <NetworkCard /> */}
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
@@ -346,6 +324,7 @@ export default function Header() {
             </AccountElement>
           </HeaderElement>
         </HeaderControls>
+        <Menu />
       </HeaderRightCol>
     </HeaderFrame>
   )

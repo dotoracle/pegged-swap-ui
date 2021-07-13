@@ -1,23 +1,11 @@
 import React, { useRef } from 'react'
-import styled, { css } from 'styled-components/macro'
-import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
+import styled from 'styled-components/macro'
+import { Menu as MenuIcon, X } from 'react-feather'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
 import { ApplicationModal } from '../../state/application/actions'
 import { useModalOpen, useToggleModal } from '../../state/application/hooks'
 import { ExternalLink } from '../../theme'
 import NAV_ITEMS from '../Header/NavItems'
-
-export enum FlyoutAlignment {
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT',
-}
-
-const StyledMenuIcon = styled(MenuIcon)`
-  color: ${({ theme }) => theme.text1};
-  path {
-    stroke: ${({ theme }) => theme.text1};
-  }
-`
 
 const StyledMenuButton = styled.button`
   width: 100%;
@@ -27,6 +15,7 @@ const StyledMenuButton = styled.button`
   margin: 0;
   padding: 0;
   height: 35px;
+  color: ${({ theme }) => theme.text1};
 
   :hover,
   :focus {
@@ -53,7 +42,7 @@ const StyledMenu = styled.div`
   }
 `
 
-const MenuFlyout = styled.span<{ flyoutAlignment?: FlyoutAlignment }>`
+const MenuFlyout = styled.span`
   min-width: 8.125rem;
   background-color: ${({ theme }) => theme.bg2};
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
@@ -65,15 +54,8 @@ const MenuFlyout = styled.span<{ flyoutAlignment?: FlyoutAlignment }>`
   font-size: 1rem;
   position: absolute;
   top: 3rem;
+  right: 0rem;
   z-index: 100;
-  ${({ flyoutAlignment = FlyoutAlignment.RIGHT }) =>
-    flyoutAlignment === FlyoutAlignment.RIGHT
-      ? css`
-          right: 0rem;
-        `
-      : css`
-          left: 0rem;
-        `};
 `
 
 const MenuItem = styled(ExternalLink)`
@@ -101,9 +83,7 @@ export default function Menu() {
 
   return (
     <StyledMenu ref={node as any}>
-      <StyledMenuButton onClick={toggle}>
-        <StyledMenuIcon />
-      </StyledMenuButton>
+      <StyledMenuButton onClick={toggle}>{open ? <X /> : <MenuIcon />}</StyledMenuButton>
 
       {open && (
         <MenuFlyout>

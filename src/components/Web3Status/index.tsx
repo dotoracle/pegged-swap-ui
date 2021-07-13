@@ -39,10 +39,11 @@ const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
   width: 100%;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 12px;
+  padding: 0.625rem 1.375rem;
+  border-radius: 4px;
   cursor: pointer;
   user-select: none;
+
   :focus {
     outline: none;
   }
@@ -59,30 +60,15 @@ const Web3StatusError = styled(Web3StatusGeneric)`
 `
 
 const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
-  background-color: ${({ theme }) => theme.primary4};
-  border: none;
-  color: ${({ theme }) => theme.primaryText1};
-  font-weight: 500;
+  background-color: ${({ theme }) => theme.pink};
+  color: ${({ theme }) => theme.white};
+  text-transform: uppercase;
 
-  :hover,
-  :focus {
-    border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
-    color: ${({ theme }) => theme.primaryText1};
+  &:hover {
+    background-color: ${({ theme }) => theme.pink2};
+    border-color: ${({ theme }) => theme.pink2};
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 15%), 0 2px 2px -1px rgb(0 0 0 / 30%);
   }
-
-  ${({ faded }) =>
-    faded &&
-    css`
-      background-color: ${({ theme }) => theme.primary5};
-      border: 1px solid ${({ theme }) => theme.primary5};
-      color: ${({ theme }) => theme.primaryText1};
-
-      :hover,
-      :focus {
-        border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
-        color: ${({ theme }) => darken(0.05, theme.primaryText1)};
-      }
-    `}
 `
 
 const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
@@ -105,10 +91,10 @@ const Text = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0 0.5rem 0 0.25rem;
+  margin: 0;
   font-size: 1rem;
+  font-weight: 700;
   width: fit-content;
-  font-weight: 500;
 `
 
 const NetworkIcon = styled(Activity)`
@@ -211,7 +197,7 @@ function Web3StatusInner() {
     return (
       <Web3StatusConnect id="connect-wallet" onClick={toggleWalletModal} faded={!account}>
         <Text>
-          <Trans>Connect to a wallet</Trans>
+          <Trans>Connect Wallet</Trans>
         </Text>
       </Web3StatusConnect>
     )
