@@ -11,8 +11,8 @@ import { useUserHasSubmittedClaim } from 'state/transactions/hooks'
 import { useDarkModeManager } from 'state/user/hooks'
 import { useETHBalances } from 'state/wallet/hooks'
 import styled from 'styled-components/macro'
-import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo_white.svg'
+import Logo from '../../assets/images/logo.png'
+import LogoMobilePNG from '../../assets/images/logo-mobile.png'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { ExternalLink, TYPE } from '../../theme'
 import ClaimModal from '../claim/ClaimModal'
@@ -32,28 +32,15 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
+  margin: 0px auto;
+  padding: 0px 15px;
   width: 100%;
+  max-width: 1280px;
   top: 0;
   position: relative;
   padding: 1rem;
   z-index: 21;
   position: relative;
-
-  /* Background slide effect on scroll. */
-  background-image: ${({ theme }) => `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`}
-  background-position: ${({ showBackground }) => (showBackground ? '0 -100%' : '0 0')};
-  background-size: 100% 200%;
-  box-shadow: 0px 0px 0px 1px ${({ theme, showBackground }) => (showBackground ? theme.bg2 : 'transparent;')};
-  transition: background-position .1s, box-shadow .1s;
-
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    padding:  1rem;
-    grid-template-columns: auto 1fr;
-  `};
-
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    padding: 1rem;
-  `}
 `
 
 const HeaderControls = styled.div`
@@ -185,10 +172,19 @@ const Title = styled.a`
   }
 `
 
-const UniIcon = styled.div`
-  transition: transform 0.3s ease;
-  :hover {
-    transform: rotate(-5deg);
+const LogoDesktop = styled.img`
+  display: none;
+
+  @media (min-width: 992px) {
+    display: block;
+  }
+`
+
+const LogoMobile = styled.img`
+  display: block;
+
+  @media (min-width: 992px) {
+    display: none;
   }
 `
 
@@ -310,9 +306,8 @@ export default function Header() {
       </Modal>
       <HeaderRow>
         <Title href=".">
-          <UniIcon>
-            <img width={'24px'} src={darkMode ? LogoDark : Logo} alt="logo" />
-          </UniIcon>
+          <LogoDesktop src={Logo} alt="DotOracle" />
+          <LogoMobile src={LogoMobilePNG} alt="DotOracle" />
         </Title>
       </HeaderRow>
       <HeaderLinks>

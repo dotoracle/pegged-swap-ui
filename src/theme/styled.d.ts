@@ -55,6 +55,8 @@ export interface Colors {
   error: Color
   success: Color
   warning: Color
+
+  headerBg: Color
 }
 
 declare module 'styled-components/macro' {

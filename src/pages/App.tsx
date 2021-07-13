@@ -53,10 +53,10 @@ const BodyWrapper = styled.div`
 const HeaderWrapper = styled.div`
   ${({ theme }) => theme.flexRowNoWrap}
   width: 100%;
-  justify-content: space-between;
-  position: fixed;
-  top: 0;
-  z-index: 2;
+  min-height: 80px;
+  border-bottom: none;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+  background-color: ${(props) => props.theme.headerBg};
 `
 
 const Marginer = styled.div`
