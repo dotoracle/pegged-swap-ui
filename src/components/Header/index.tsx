@@ -2,13 +2,11 @@ import { Trans } from '@lingui/macro'
 import useScrollPosition from '@react-hook/window-scroll'
 import { darken } from 'polished'
 import { useState } from 'react'
-import { Moon, Sun } from 'react-feather'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useShowClaimPopup, useToggleSelfClaimModal } from 'state/application/hooks'
 import { useUserHasAvailableClaim } from 'state/claim/hooks'
 import { useUserHasSubmittedClaim } from 'state/transactions/hooks'
-import { useDarkModeManager } from 'state/user/hooks'
 import { useETHBalances } from 'state/wallet/hooks'
 import styled from 'styled-components/macro'
 import Logo from '../../assets/images/logo.png'
@@ -77,11 +75,6 @@ const HeaderElement = styled.div`
     flex-direction: row-reverse;
     align-items: center;
   `};
-`
-
-const HeaderElementWrap = styled.div`
-  display: flex;
-  align-items: center;
 `
 
 const HeaderRow = styled(RowFixed)`
@@ -316,8 +309,6 @@ export default function Header() {
   const { account } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
-  // const [isDark] = useDarkModeManager()
-  const [darkMode, toggleDarkMode] = useDarkModeManager()
 
   const toggleClaimModal = useToggleSelfClaimModal()
 
@@ -409,11 +400,6 @@ export default function Header() {
               <Web3Status />
             </AccountElement>
           </HeaderElement>
-          <HeaderElementWrap>
-            <StyledMenuButton onClick={() => toggleDarkMode()}>
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-            </StyledMenuButton>
-          </HeaderElementWrap>
         </HeaderControls>
       </HeaderRightCol>
     </HeaderFrame>
