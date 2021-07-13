@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro'
 import { ButtonGray, ButtonOutlined, ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
-import { FlyoutAlignment, NewMenu } from 'components/Menu'
+// import { FlyoutAlignment, NewMenu } from 'components/Menu'
 import { SwapPoolTabs } from 'components/NavigationTabs'
 import PositionList from 'components/PositionList'
 import { RowBetween, RowFixed } from 'components/Row'
@@ -52,13 +52,13 @@ const ButtonRow = styled(RowFixed)`
     justify-content: space-between;
   `};
 `
-const Menu = styled(NewMenu)`
-  margin-left: 0;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex: 1 1 auto;
-    width: 49%;
-  `};
-`
+// const Menu = styled(NewMenu)`
+//   margin-left: 0;
+//   ${({ theme }) => theme.mediaWidth.upToSmall`
+//     flex: 1 1 auto;
+//     width: 49%;
+//   `};
+// `
 const MenuItem = styled.div`
   align-items: center;
   display: flex;
@@ -186,7 +186,7 @@ export default function Pool() {
                 </TYPE.mediumHeader>
               </HideSmall>
               <ButtonRow>
-                <Menu
+                {/* <Menu
                   menuItems={menuItems}
                   flyoutAlignment={FlyoutAlignment.LEFT}
                   ToggleUI={(props: any) => (
@@ -197,7 +197,7 @@ export default function Pool() {
                       </TYPE.body>
                     </MoreOptionsButton>
                   )}
-                />
+                /> */}
                 <ResponsiveButtonPrimary id="join-pool-button" as={Link} to="/add/ETH">
                   + <Trans>New Position</Trans>
                 </ResponsiveButtonPrimary>

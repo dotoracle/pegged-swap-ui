@@ -5,6 +5,7 @@ export interface Colors {
   // base
   white: Color
   black: Color
+  pink: Color
 
   // text
   text1: Color

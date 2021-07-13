@@ -74,7 +74,6 @@
     "ethers": "^5.2.0",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
-    "inter-ui": "^3.13.1",
     "lightweight-charts": "^3.3.0",
     "lodash.flatmap": "^4.5.0",
     "lodash.inrange": "^3.3.6",
