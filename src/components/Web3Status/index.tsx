@@ -66,7 +66,6 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
 
   &:hover {
     background-color: ${({ theme }) => theme.pink2};
-    border-color: ${({ theme }) => theme.pink2};
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 15%), 0 2px 2px -1px rgb(0 0 0 / 30%);
   }
 `
