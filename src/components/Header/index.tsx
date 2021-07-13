@@ -231,7 +231,7 @@ const MenuItem = styled.div`
 const MenuLink = styled.a`
   position: relative;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
   text-decoration: none;
 
