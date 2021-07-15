@@ -16,6 +16,8 @@ import ERC20_ABI from 'abis/erc20.json'
 import ERC20_BYTES32_ABI from 'abis/erc20_bytes32.json'
 import WETH_ABI from 'abis/weth.json'
 import EIP_2612 from 'abis/eip_2612.json'
+import DTOPeggedSwapRouterABI from 'abis/DTOPeggedSwapRouter.json'
+import DTOPeggedSwapPairABI from 'abis/DTOPeggedSwapPair.json'
 
 import {
   NONFUNGIBLE_POSITION_MANAGER_ADDRESSES,
@@ -95,11 +97,11 @@ export function useEIP2612Contract(tokenAddress?: string): Contract | null {
 }
 
 export function usePairContract(pairAddress?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(pairAddress, IUniswapV2PairABI, withSignerIfPossible)
+  return useContract(pairAddress, DTOPeggedSwapPairABI, withSignerIfPossible)
 }
 
 export function useV2RouterContract(): Contract | null {
-  return useContract(V2_ROUTER_ADDRESS, IUniswapV2Router02ABI, true)
+  return useContract(V2_ROUTER_ADDRESS, DTOPeggedSwapRouterABI, true)
 }
 
 export function useMulticall2Contract() {
