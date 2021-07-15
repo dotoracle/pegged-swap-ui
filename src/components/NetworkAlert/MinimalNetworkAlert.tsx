@@ -1,14 +1,7 @@
 import { Trans } from '@lingui/macro'
-import {
-  ArbitrumWrapperBackgroundDarkMode,
-  ArbitrumWrapperBackgroundLightMode,
-  OptimismWrapperBackgroundDarkMode,
-  OptimismWrapperBackgroundLightMode,
-} from 'components/NetworkAlert/NetworkAlert'
-import { L2_CHAIN_IDS, L2_INFO, NETWORK_LABELS, SupportedChainId } from 'constants/chains'
+import { NETWORK_LABELS } from 'constants/chains'
 import { useActiveWeb3React } from 'hooks/web3'
 import { ArrowDownCircle } from 'react-feather'
-import { useArbitrumAlphaAlert, useDarkModeManager } from 'state/user/hooks'
 import styled from 'styled-components/macro'
 import { MEDIA_WIDTHS } from 'theme'
 
@@ -27,15 +20,7 @@ const DesktopTextBreak = styled.div`
     display: block;
   }
 `
-const Wrapper = styled.div<{ chainId: SupportedChainId; darkMode: boolean; logoUrl: string }>`
-  ${({ chainId, darkMode }) =>
-    chainId === SupportedChainId.OPTIMISM
-      ? darkMode
-        ? OptimismWrapperBackgroundDarkMode
-        : OptimismWrapperBackgroundLightMode
-      : darkMode
-      ? ArbitrumWrapperBackgroundDarkMode
-      : ArbitrumWrapperBackgroundLightMode};
+const Wrapper = styled.div<{ logoUrl: string }>`
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -100,24 +85,9 @@ const LinkOutToBridge = styled.a`
 `
 export function MinimalNetworkAlert() {
   const { chainId } = useActiveWeb3React()
-  const [darkMode] = useDarkModeManager()
-  const [arbitrumAlphaAcknowledged] = useArbitrumAlphaAlert()
 
-  if (!chainId || !L2_CHAIN_IDS.includes(chainId) || arbitrumAlphaAcknowledged) {
+  if (!chainId) {
     return null
   }
-  const info = L2_INFO[chainId]
-  return (
-    <Wrapper darkMode={darkMode} chainId={chainId} logoUrl={info.logoUrl}>
-      <L2Icon src={info.logoUrl} />
-      <Body>
-        <Trans>This is an alpha release of Uniswap on the {NETWORK_LABELS[chainId]} network.</Trans>
-        <DesktopTextBreak /> <Trans>You must bridge L1 assets to the network to swap them.</Trans>
-      </Body>
-      <LinkOutToBridge href={info.bridge} target="_blank" rel="noopener noreferrer">
-        <Trans>Deposit to {NETWORK_LABELS[chainId]}</Trans>
-        <LinkOutCircle />
-      </LinkOutToBridge>
-    </Wrapper>
-  )
+  return <></>
 }

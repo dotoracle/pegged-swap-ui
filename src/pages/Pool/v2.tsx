@@ -24,7 +24,6 @@ import { useStakingInfo } from '../../state/stake/hooks'
 import { BIG_INT_ZERO } from '../../constants/misc'
 import { Pair } from '@uniswap/v2-sdk'
 import { Trans } from '@lingui/macro'
-import { L2_CHAIN_IDS } from 'constants/chains'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -133,7 +132,7 @@ export default function Pool() {
     )
   })
 
-  const ON_L2 = chainId && L2_CHAIN_IDS.includes(chainId)
+  const ON_L2 = chainId
 
   return (
     <>

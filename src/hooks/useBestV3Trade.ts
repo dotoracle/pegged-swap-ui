@@ -1,6 +1,5 @@
 import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
 import { encodeRouteToPath, Route, Trade } from '@uniswap/v3-sdk'
-import { SupportedChainId } from 'constants/chains'
 import { BigNumber } from 'ethers'
 import { useMemo } from 'react'
 import { useSingleContractMultipleData } from '../state/multicall/hooks'
@@ -16,10 +15,7 @@ export enum V3TradeState {
   SYNCING,
 }
 
-const QUOTE_GAS_OVERRIDES: { [chainId: number]: number } = {
-  [SupportedChainId.OPTIMISM]: 6_000_000,
-  [SupportedChainId.OPTIMISTIC_KOVAN]: 6_000_000,
-}
+const QUOTE_GAS_OVERRIDES: { [chainId: number]: number } = {}
 
 /**
  * Returns the best v3 trade for a desired exact input swap

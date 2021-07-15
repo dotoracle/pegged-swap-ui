@@ -12,7 +12,6 @@ import { useTotalUniEarned } from '../stake/hooks'
 import { Interface } from '@ethersproject/abi'
 import ERC20ABI from 'abis/erc20.json'
 import { Erc20Interface } from 'abis/types/Erc20'
-import { SupportedChainId } from 'constants/chains'
 /**
  * Returns a map of the given addresses to their eventually consistent ETH balances.
  */
@@ -51,10 +50,7 @@ export function useETHBalances(uncheckedAddresses?: (string | undefined)[]): {
   )
 }
 
-const TOKEN_BALANCE_GAS_OVERRIDE: { [chainId: number]: number } = {
-  [SupportedChainId.OPTIMISM]: 250_000,
-  [SupportedChainId.OPTIMISTIC_KOVAN]: 250_000,
-}
+const TOKEN_BALANCE_GAS_OVERRIDE: { [chainId: number]: number } = {}
 
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.

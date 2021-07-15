@@ -1,11 +1,6 @@
 import { SupportedChainId } from '../constants/chains'
 
-const MAINNET_AND_TESTNETS = [
-  SupportedChainId.MAINNET,
-  SupportedChainId.RINKEBY,
-  SupportedChainId.GOERLI,
-  SupportedChainId.KOVAN,
-]
+const MAINNET_AND_TESTNETS = [SupportedChainId.MAINNET, SupportedChainId.KOVAN]
 
 export function constructSameAddressMap<T extends string>(
   address: T,

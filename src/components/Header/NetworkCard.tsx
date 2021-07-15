@@ -1,4 +1,3 @@
-import { Trans } from '@lingui/macro'
 import { YellowCard } from 'components/Card'
 import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import { useActiveWeb3React } from 'hooks/web3'
@@ -9,7 +8,7 @@ import { useModalOpen, useToggleModal } from 'state/application/hooks'
 import styled, { css } from 'styled-components/macro'
 import { ExternalLink, MEDIA_WIDTHS } from 'theme'
 import { switchToNetwork } from 'utils/switchToNetwork'
-import { L2_CHAIN_IDS, L2_INFO, NETWORK_LABELS, SupportedChainId } from '../../constants/chains'
+import { NETWORK_LABELS, SupportedChainId } from '../../constants/chains'
 
 const StopOverflowQuery = `@media screen and (min-width: ${MEDIA_WIDTHS.upToMedium}px) and (max-width: ${
   MEDIA_WIDTHS.upToMedium + 400
@@ -33,9 +32,6 @@ const BaseWrapper = css`
     flex-shrink: 1;
   `};
 `
-const L2Wrapper = styled.div`
-  ${BaseWrapper}
-`
 const BaseMenuItem = css`
   align-items: center;
   background-color: transparent;
@@ -53,21 +49,6 @@ const BaseMenuItem = css`
     text-decoration: none;
   }
 `
-const DisabledMenuItem = styled.div`
-  ${BaseMenuItem}
-  align-items: center;
-  background-color: ${({ theme }) => theme.bg2};
-  cursor: auto;
-  display: flex;
-  font-size: 10px;
-  font-style: italic;
-  justify-content: center;
-  :hover,
-  :active,
-  :focus {
-    color: ${({ theme }) => theme.text2};
-  }
-`
 const FallbackWrapper = styled(YellowCard)`
   ${BaseWrapper}
   width: auto;
@@ -80,14 +61,6 @@ const Icon = styled.img`
 const L1Tag = styled.div`
   color: #c4d9f8;
   opacity: 40%;
-`
-const L2Tag = styled.div<{ chainId: SupportedChainId }>`
-  background-color: ${({ chainId }) => (chainId === SupportedChainId.ARBITRUM_ONE ? '#28A0F0' : '#FF0420')};
-  border-radius: 6px;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 6px;
 `
 const MenuFlyout = styled.span`
   background-color: ${({ theme }) => theme.bg2};
@@ -179,53 +152,6 @@ export default function NetworkCard() {
 
   if (!chainId || chainId === SupportedChainId.MAINNET || !NETWORK_LABELS[chainId] || !library) {
     return null
-  }
-
-  if (L2_CHAIN_IDS.includes(chainId)) {
-    const info = L2_INFO[chainId]
-    return (
-      <L2Wrapper ref={node}>
-        <NetworkInfo onClick={toggle}>
-          <Icon src={info.logoUrl} />
-          <span>{NETWORK_LABELS[chainId]}</span>
-          <L2Tag chainId={chainId}>L2 Alpha</L2Tag>
-        </NetworkInfo>
-        {open && (
-          <MenuFlyout>
-            <MenuItem href={info.bridge}>
-              <div>
-                <Trans>{NETWORK_LABELS[chainId]} Bridge</Trans>
-              </div>
-              <LinkOutCircle />
-            </MenuItem>
-            <MenuItem href={info.explorer}>
-              <div>
-                <Trans>{NETWORK_LABELS[chainId]} Explorer</Trans>
-              </div>
-              <LinkOutCircle />
-            </MenuItem>
-            <MenuItem href={info.docs}>
-              <div>
-                <Trans>Learn more</Trans>
-              </div>
-              <LinkOutCircle />
-            </MenuItem>
-            {implements3085 ? (
-              <ButtonMenuItem onClick={() => switchToNetwork({ library, chainId: SupportedChainId.MAINNET })}>
-                <div>
-                  <Trans>Switch to Ethereum</Trans>
-                </div>
-                <L1Tag>L1</L1Tag>
-              </ButtonMenuItem>
-            ) : (
-              <DisabledMenuItem>
-                <Trans>Change your network to go back to L1</Trans>
-              </DisabledMenuItem>
-            )}
-          </MenuFlyout>
-        )}
-      </L2Wrapper>
-    )
   }
 
   return <FallbackWrapper title={NETWORK_LABELS[chainId]}>{NETWORK_LABELS[chainId]}</FallbackWrapper>

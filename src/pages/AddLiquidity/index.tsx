@@ -534,9 +534,7 @@ export default function AddLiquidity({
       </AutoColumn>
     )
   // flag for whether pool creation must be a separate tx
-  const mustCreateSeparately =
-    noLiquidity && (chainId === SupportedChainId.OPTIMISM || chainId === SupportedChainId.OPTIMISTIC_KOVAN)
-
+  const mustCreateSeparately = noLiquidity
   return (
     <>
       <ScrollablePage>

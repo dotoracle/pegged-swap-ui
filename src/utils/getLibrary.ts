@@ -1,12 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers'
 import { SupportedChainId } from '../constants/chains'
 
-const NETWORK_POLLING_INTERVALS: { [chainId: number]: number } = {
-  [SupportedChainId.ARBITRUM_ONE]: 1_000,
-  [SupportedChainId.ARBITRUM_RINKEBY]: 1_000,
-  [SupportedChainId.OPTIMISM]: 1_000,
-  [SupportedChainId.OPTIMISTIC_KOVAN]: 1_000,
-}
+const NETWORK_POLLING_INTERVALS: { [chainId: number]: number } = {}
 
 export default function getLibrary(provider: any): Web3Provider {
   const library = new Web3Provider(
