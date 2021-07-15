@@ -81,7 +81,7 @@ function graphqlRequestBaseQuery(): BaseQueryFn<
       let client: GraphQLClient | null = null
 
       switch (chainId) {
-        case SupportedChainId.MAINNET:
+        case SupportedChainId.ETHER_MAINNET:
           client = new GraphQLClient(UNISWAP_V3_GRAPH_URL)
           break
         default:

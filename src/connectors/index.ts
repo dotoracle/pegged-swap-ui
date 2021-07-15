@@ -14,11 +14,11 @@ if (typeof INFURA_KEY === 'undefined') {
 const NETWORK_URLS: {
   [chainId in SupportedChainId]: string
 } = {
-  [SupportedChainId.MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.ETHER_MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.KOVAN]: `https://kovan.infura.io/v3/${INFURA_KEY}`,
 }
 
-const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.MAINNET, SupportedChainId.KOVAN]
+const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.ETHER_MAINNET, SupportedChainId.KOVAN]
 
 export const network = new NetworkConnector({
   urls: NETWORK_URLS,

@@ -22,16 +22,16 @@ export const GOVERNANCE_ALPHA_V0_ADDRESSES: AddressMap = constructSameAddressMap
  * The latest governor alpha that is currently admin of timelock
  */
 export const GOVERNANCE_ALPHA_V1_ADDRESSES: AddressMap = {
-  [SupportedChainId.MAINNET]: '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6',
+  [SupportedChainId.ETHER_MAINNET]: '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6',
 }
 
 export const TIMELOCK_ADDRESS: AddressMap = constructSameAddressMap('0x1a9C8182C09F50C8318d769245beA52c32BE35BC')
 
 export const MERKLE_DISTRIBUTOR_ADDRESS: AddressMap = {
-  [SupportedChainId.MAINNET]: '0x090D4613473dEE047c3f2706764f49E0821D256e',
+  [SupportedChainId.ETHER_MAINNET]: '0x090D4613473dEE047c3f2706764f49E0821D256e',
 }
 export const ARGENT_WALLET_DETECTOR_ADDRESS: AddressMap = {
-  [SupportedChainId.MAINNET]: '0xeca4B0bDBf7c55E9b7925919d03CbF8Dc82537E8',
+  [SupportedChainId.ETHER_MAINNET]: '0xeca4B0bDBf7c55E9b7925919d03CbF8Dc82537E8',
 }
 export const V3_CORE_FACTORY_ADDRESSES: AddressMap = constructSameAddressMap(V3_FACTORY_ADDRESS, [])
 export const QUOTER_ADDRESSES: AddressMap = constructSameAddressMap('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', [])
@@ -39,10 +39,10 @@ export const NONFUNGIBLE_POSITION_MANAGER_ADDRESSES: AddressMap = constructSameA
   '0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
 )
 export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
-  [SupportedChainId.MAINNET]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+  [SupportedChainId.ETHER_MAINNET]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
 }
 export const SOCKS_CONTROLLER_ADDRESSES: AddressMap = {
-  [SupportedChainId.MAINNET]: '0x65770b5283117639760beA3F867b69b3697a91dd',
+  [SupportedChainId.ETHER_MAINNET]: '0x65770b5283117639760beA3F867b69b3697a91dd',
 }
 export const SWAP_ROUTER_ADDRESSES: AddressMap = constructSameAddressMap(
   '0xE592427A0AEce92De3Edee1F18E0157C05861564',

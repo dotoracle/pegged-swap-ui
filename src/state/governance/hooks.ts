@@ -121,7 +121,7 @@ export function useAllProposalData(): { data: ProposalData[]; loading: boolean }
   const proposalCount1 = useProposalCount(gov1)
 
   const gov0ProposalIndexes = useMemo(() => {
-    return chainId === SupportedChainId.MAINNET ? V0_PROPOSAL_IDS : countToIndices(proposalCount0)
+    return chainId === SupportedChainId.ETHER_MAINNET ? V0_PROPOSAL_IDS : countToIndices(proposalCount0)
   }, [chainId, proposalCount0])
   const gov1ProposalIndexes = useMemo(() => {
     return countToIndices(proposalCount1)

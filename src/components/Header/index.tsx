@@ -14,7 +14,6 @@ import Menu from '../Menu'
 import Modal from '../Modal'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
-import NetworkCard from './NetworkCard'
 import UniBalanceContent from './UniBalanceContent'
 import NAV_ITEMS from './NavItems'
 
@@ -313,7 +312,6 @@ export default function Header() {
         </HeaderLinks>
         <HeaderControls>
           <HeaderElement>
-            {/* <NetworkCard /> */}
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>

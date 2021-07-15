@@ -50,7 +50,7 @@ const mAssetsAdditionalBases: { [tokenAddress: string]: Token[] } = {
   '0xf72FCd9DCF0190923Fadd44811E240Ef4533fc86': [MIR, UST], // mVIXY
 }
 const WETH_ONLY: ChainTokenList = {
-  [SupportedChainId.MAINNET]: [WETH9_EXTENDED[SupportedChainId.MAINNET]],
+  [SupportedChainId.ETHER_MAINNET]: [WETH9_EXTENDED[SupportedChainId.ETHER_MAINNET]],
   [SupportedChainId.KOVAN]: [WETH9_EXTENDED[SupportedChainId.KOVAN]],
 }
 // used to construct intermediary pairs for trading
