@@ -108,6 +108,20 @@ export const UNI: { [chainId: number]: Token } = {
 
 export const WETH9_EXTENDED: { [chainId: number]: Token } = {
   ...WETH9,
+  [SupportedChainId.BSC_MAINNET]: new Token(
+    SupportedChainId.BSC_MAINNET,
+    '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+    18,
+    'ETH',
+    'Binance-Peg Ethereum'
+  ),
+  [SupportedChainId.BSC_TESTNET]: new Token(
+    SupportedChainId.BSC_TESTNET,
+    '0x4200000000000000000000000000000000000006',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
 }
 
 export class ExtendedEther extends Ether {

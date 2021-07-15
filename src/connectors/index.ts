@@ -16,9 +16,16 @@ const NETWORK_URLS: {
 } = {
   [SupportedChainId.ETHER_MAINNET]: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.KOVAN]: `https://kovan.infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.BSC_MAINNET]: 'https://bsc-dataseed.binance.org/',
+  [SupportedChainId.BSC_TESTNET]: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
 }
 
-const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [SupportedChainId.ETHER_MAINNET, SupportedChainId.KOVAN]
+const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
+  SupportedChainId.ETHER_MAINNET,
+  SupportedChainId.KOVAN,
+  SupportedChainId.BSC_MAINNET,
+  SupportedChainId.BSC_TESTNET,
+]
 
 export const network = new NetworkConnector({
   urls: NETWORK_URLS,
