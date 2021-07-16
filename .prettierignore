@@ -1,1 +1,2 @@
-/src/state/data/generated.ts
+# Ignore all CSS files:
+*.css

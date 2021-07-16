@@ -1,26 +1,43 @@
-import { t } from '@lingui/macro'
-import JSBI from 'jsbi'
-import { Trade as V3Trade } from '@uniswap/v3-sdk'
-import { useBestV3TradeExactIn, useBestV3TradeExactOut, V3TradeState } from '../../hooks/useBestV3Trade'
-import useENS from '../../hooks/useENS'
-import { parseUnits } from '@ethersproject/units'
-import { Currency, CurrencyAmount, Percent, TradeType } from '@uniswap/sdk-core'
-import { Trade as V2Trade } from '@uniswap/v2-sdk'
-import { ParsedQs } from 'qs'
-import { useCallback, useEffect, useState } from 'react'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { useCurrency } from '../../hooks/Tokens'
-import useSwapSlippageTolerance from '../../hooks/useSwapSlippageTolerance'
-import { Version } from '../../hooks/useToggledVersion'
-import { useV2TradeExactIn, useV2TradeExactOut } from '../../hooks/useV2Trade'
-import useParsedQueryString from '../../hooks/useParsedQueryString'
-import { isAddress } from '../../utils'
-import { AppState } from '../index'
-import { useCurrencyBalances } from '../wallet/hooks'
+import { AppDispatch, AppState } from '../index'
+import { ChainId, Currency, CurrencyAmount, JSBI, Percent, TradeType, Trade as V2Trade, WNATIVE } from '@sushiswap/sdk'
+import { DEFAULT_ARCHER_ETH_TIP, DEFAULT_ARCHER_GAS_ESTIMATE } from '../../constants'
+// import {
+//   EstimatedSwapCall,
+//   SuccessfulCall,
+//   useSwapCallArguments,
+// } from "../../hooks/useSwapCallback";
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import { isAddress, isZero } from '../../functions/validate'
+import { useAppDispatch, useAppSelector } from '../hooks'
+import { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useV2TradeExactIn as useTradeExactIn, useV2TradeExactOut as useTradeExactOut } from '../../hooks/useV2Trades'
+import {
+  useUserArcherETHTip,
+  useUserArcherGasEstimate,
+  useUserArcherGasPrice,
+  useUserArcherTipManualOverride,
+  useUserSingleHopOnly,
+  useUserSlippageTolerance,
+} from '../user/hooks'
+
+import { ParsedQs } from 'qs'
 import { SwapState } from './reducer'
-import { useUserSingleHopOnly } from 'state/user/hooks'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
+import { t } from '@lingui/macro'
+import { tryParseAmount } from '../../functions/parse'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { useCurrency } from '../../hooks/Tokens'
+import { useCurrencyBalances } from '../wallet/hooks'
+import useENS from '../../hooks/useENS'
+import { useLingui } from '@lingui/react'
+import useParsedQueryString from '../../hooks/useParsedQueryString'
+import useSwapSlippageTolerance from '../../hooks/useSwapSlippageTollerence'
+import {
+  EstimatedSwapCall,
+  SuccessfulCall,
+  swapErrorToUserReadableMessage,
+  useSwapCallArguments,
+} from '../../hooks/useSwapCallback'
 
 export function useSwapState(): AppState['swap'] {
   return useAppSelector((state) => state.swap)
@@ -38,7 +55,11 @@ export function useSwapActionHandlers(): {
       dispatch(
         selectCurrency({
           field,
-          currencyId: currency.isToken ? currency.address : currency.isNative ? 'ETH' : '',
+          currencyId: currency.isToken
+            ? currency.address
+            : currency.isNative && currency.chainId !== ChainId.CELO
+            ? 'ETH'
+            : '',
         })
       )
     },
@@ -71,28 +92,12 @@ export function useSwapActionHandlers(): {
   }
 }
 
-// try to parse a user entered amount for a given token
-export function tryParseAmount<T extends Currency>(value?: string, currency?: T): CurrencyAmount<T> | undefined {
-  if (!value || !currency) {
-    return undefined
-  }
-  try {
-    const typedValueParsed = parseUnits(value, currency.decimals).toString()
-    if (typedValueParsed !== '0') {
-      return CurrencyAmount.fromRawAmount(currency, JSBI.BigInt(typedValueParsed))
-    }
-  } catch (error) {
-    // should fail if the user specifies too many decimal places of precision (or maybe exceed max uint?)
-    console.debug(`Failed to parse input amount: "${value}"`, error)
-  }
-  // necessary for all paths to return a value
-  return undefined
-}
-
-const BAD_RECIPIENT_ADDRESSES: { [address: string]: true } = {
-  '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f': true, // v2 factory
-  '0xf164fC0Ec4E93095b804a4795bBe1e041497b92a': true, // v2 router 01
-  '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D': true, // v2 router 02
+// TODO: Swtich for ours...
+const BAD_RECIPIENT_ADDRESSES: { [chainId: string]: { [address: string]: true } } = {
+  [ChainId.MAINNET]: {
+    '0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac': true, // v2 factory
+    '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F': true, // v2 router 02
+  },
 }
 
 /**
@@ -100,11 +105,8 @@ const BAD_RECIPIENT_ADDRESSES: { [address: string]: true } = {
  * @param trade to check for the given address
  * @param checksummedAddress address to check in the pairs and tokens
  */
-function involvesAddress(
-  trade: V2Trade<Currency, Currency, TradeType> | V3Trade<Currency, Currency, TradeType>,
-  checksummedAddress: string
-): boolean {
-  const path = trade instanceof V2Trade ? trade.route.path : trade.route.tokenPath
+function involvesAddress(trade: V2Trade<Currency, Currency, TradeType>, checksummedAddress: string): boolean {
+  const path = trade.route.path
   return (
     path.some((token) => token.address === checksummedAddress) ||
     (trade instanceof V2Trade
@@ -114,17 +116,17 @@ function involvesAddress(
 }
 
 // from the current swap inputs, compute the best trade and return it.
-export function useDerivedSwapInfo(toggledVersion: Version): {
+export function useDerivedSwapInfo(doArcher = false): {
   currencies: { [field in Field]?: Currency }
   currencyBalances: { [field in Field]?: CurrencyAmount<Currency> }
   parsedAmount: CurrencyAmount<Currency> | undefined
   inputError?: string
   v2Trade: V2Trade<Currency, Currency, TradeType> | undefined
-  v3TradeState: { trade: V3Trade<Currency, Currency, TradeType> | null; state: V3TradeState }
-  toggledTrade: V2Trade<Currency, Currency, TradeType> | V3Trade<Currency, Currency, TradeType> | undefined
   allowedSlippage: Percent
 } {
-  const { account } = useActiveWeb3React()
+  const { i18n } = useLingui()
+
+  const { account, chainId, library } = useActiveWeb3React()
 
   const [singleHopOnly] = useUserSingleHopOnly()
 
@@ -137,8 +139,11 @@ export function useDerivedSwapInfo(toggledVersion: Version): {
   } = useSwapState()
 
   const inputCurrency = useCurrency(inputCurrencyId)
+
   const outputCurrency = useCurrency(outputCurrencyId)
+
   const recipientLookup = useENS(recipient ?? undefined)
+
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
 
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
@@ -149,18 +154,15 @@ export function useDerivedSwapInfo(toggledVersion: Version): {
   const isExactIn: boolean = independentField === Field.INPUT
   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
 
-  const bestV2TradeExactIn = useV2TradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined, {
-    maxHops: singleHopOnly ? 1 : undefined,
-  })
-  const bestV2TradeExactOut = useV2TradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined, {
+  const bestTradeExactIn = useTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined, {
     maxHops: singleHopOnly ? 1 : undefined,
   })
 
-  const bestV3TradeExactIn = useBestV3TradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
-  const bestV3TradeExactOut = useBestV3TradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
+  const bestTradeExactOut = useTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined, {
+    maxHops: singleHopOnly ? 1 : undefined,
+  })
 
-  const v2Trade = isExactIn ? bestV2TradeExactIn : bestV2TradeExactOut
-  const v3Trade = (isExactIn ? bestV3TradeExactIn : bestV3TradeExactOut) ?? undefined
+  const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut
 
   const currencyBalances = {
     [Field.INPUT]: relevantTokenBalances[0],
@@ -174,39 +176,121 @@ export function useDerivedSwapInfo(toggledVersion: Version): {
 
   let inputError: string | undefined
   if (!account) {
-    inputError = t`Connect Wallet`
+    inputError = 'Connect Wallet'
   }
 
   if (!parsedAmount) {
-    inputError = inputError ?? t`Enter an amount`
+    inputError = inputError ?? i18n._(t`Enter an amount`)
   }
 
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
-    inputError = inputError ?? t`Select a token`
+    inputError = inputError ?? i18n._(t`Select a token`)
   }
 
   const formattedTo = isAddress(to)
   if (!to || !formattedTo) {
-    inputError = inputError ?? t`Enter a recipient`
+    inputError = inputError ?? i18n._(t`Enter a recipient`)
   } else {
     if (
-      BAD_RECIPIENT_ADDRESSES[formattedTo] ||
-      (bestV2TradeExactIn && involvesAddress(bestV2TradeExactIn, formattedTo)) ||
-      (bestV2TradeExactOut && involvesAddress(bestV2TradeExactOut, formattedTo))
+      BAD_RECIPIENT_ADDRESSES?.[chainId]?.[formattedTo] ||
+      (bestTradeExactIn && involvesAddress(bestTradeExactIn, formattedTo)) ||
+      (bestTradeExactOut && involvesAddress(bestTradeExactOut, formattedTo))
     ) {
-      inputError = inputError ?? t`Invalid recipient`
+      inputError = inputError ?? i18n._(t`Invalid recipient`)
     }
   }
 
-  const toggledTrade = (toggledVersion === Version.v2 ? v2Trade : v3Trade.trade) ?? undefined
-  const allowedSlippage = useSwapSlippageTolerance(toggledTrade)
+  const allowedSlippage = useSwapSlippageTolerance(v2Trade)
 
   // compare input balance to max input based on version
   const [balanceIn, amountIn] = [currencyBalances[Field.INPUT], v2Trade?.maximumAmountIn(allowedSlippage)]
 
   if (balanceIn && amountIn && balanceIn.lessThan(amountIn)) {
-    inputError = t`Insufficient ${amountIn.currency.symbol} balance`
+    inputError = i18n._(t`Insufficient ${amountIn.currency.symbol} balance`)
   }
+
+  const swapCalls = useSwapCallArguments(v2Trade, allowedSlippage, to, undefined, doArcher)
+
+  const [, setUserETHTip] = useUserArcherETHTip()
+  const [userGasEstimate, setUserGasEstimate] = useUserArcherGasEstimate()
+  const [userGasPrice] = useUserArcherGasPrice()
+  const [userTipManualOverride, setUserTipManualOverride] = useUserArcherTipManualOverride()
+
+  useEffect(() => {
+    if (doArcher) {
+      setUserTipManualOverride(false)
+      setUserETHTip(DEFAULT_ARCHER_ETH_TIP.toString())
+      setUserGasEstimate(DEFAULT_ARCHER_GAS_ESTIMATE.toString())
+    }
+  }, [doArcher, setUserTipManualOverride, setUserETHTip, setUserGasEstimate])
+
+  useEffect(() => {
+    if (doArcher && !userTipManualOverride) {
+      setUserETHTip(JSBI.multiply(JSBI.BigInt(userGasEstimate), JSBI.BigInt(userGasPrice)).toString())
+    }
+  }, [doArcher, userGasEstimate, userGasPrice, userTipManualOverride, setUserETHTip])
+
+  useEffect(() => {
+    async function estimateGas() {
+      const estimatedCalls: EstimatedSwapCall[] = await Promise.all(
+        swapCalls.map((call) => {
+          const { address, calldata, value } = call
+
+          const tx =
+            !value || isZero(value)
+              ? { from: account, to: address, data: calldata }
+              : {
+                  from: account,
+                  to: address,
+                  data: calldata,
+                  value,
+                }
+
+          return library
+            .estimateGas(tx)
+            .then((gasEstimate) => {
+              return {
+                call,
+                gasEstimate,
+              }
+            })
+            .catch((gasError) => {
+              console.debug('Gas estimate failed, trying eth_call to extract error', call)
+
+              return library
+                .call(tx)
+                .then((result) => {
+                  console.debug('Unexpected successful call after failed estimate gas', call, gasError, result)
+                  return {
+                    call,
+                    error: new Error('Unexpected issue with estimating the gas. Please try again.'),
+                  }
+                })
+                .catch((callError) => {
+                  console.debug('Call threw error', call, callError)
+                  return {
+                    call,
+                    error: new Error(swapErrorToUserReadableMessage(callError)),
+                  }
+                })
+            })
+        })
+      )
+
+      // a successful estimation is a bignumber gas estimate and the next call is also a bignumber gas estimate
+      const successfulEstimation = estimatedCalls.find(
+        (el, ix, list): el is SuccessfulCall =>
+          'gasEstimate' in el && (ix === list.length - 1 || 'gasEstimate' in list[ix + 1])
+      )
+
+      if (successfulEstimation) {
+        setUserGasEstimate(successfulEstimation.gasEstimate.toString())
+      }
+    }
+    if (doArcher && v2Trade && swapCalls && !userTipManualOverride) {
+      estimateGas()
+    }
+  }, [doArcher, v2Trade, swapCalls, userTipManualOverride, library, setUserGasEstimate])
 
   return {
     currencies,
@@ -214,8 +298,6 @@ export function useDerivedSwapInfo(toggledVersion: Version): {
     parsedAmount,
     inputError,
     v2Trade: v2Trade ?? undefined,
-    v3TradeState: v3Trade,
-    toggledTrade,
     allowedSlippage,
   }
 }
@@ -247,13 +329,16 @@ function validatedRecipient(recipient: any): string | null {
   if (ADDRESS_REGEX.test(recipient)) return recipient
   return null
 }
-
-export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
+export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId = ChainId.MAINNET): SwapState {
   let inputCurrency = parseCurrencyFromURLParameter(parsedQs.inputCurrency)
   let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency)
   if (inputCurrency === '' && outputCurrency === '') {
-    // default to ETH input
-    inputCurrency = 'ETH'
+    if (chainId === ChainId.CELO) {
+      inputCurrency = WNATIVE[chainId].address
+    } else {
+      // default to ETH input
+      inputCurrency = 'ETH'
+    }
   } else if (inputCurrency === outputCurrency) {
     // clear output if identical
     outputCurrency = ''
@@ -276,17 +361,25 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): SwapState {
 
 // updates the swap state to use the defaults for a given network
 export function useDefaultsFromURLSearch():
-  | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
+  | {
+      inputCurrencyId: string | undefined
+      outputCurrencyId: string | undefined
+    }
   | undefined {
   const { chainId } = useActiveWeb3React()
   const dispatch = useAppDispatch()
   const parsedQs = useParsedQueryString()
-  const [result, setResult] =
-    useState<{ inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined>()
+  const [result, setResult] = useState<
+    | {
+        inputCurrencyId: string | undefined
+        outputCurrencyId: string | undefined
+      }
+    | undefined
+  >()
 
   useEffect(() => {
     if (!chainId) return
-    const parsed = queryParametersToSwapState(parsedQs)
+    const parsed = queryParametersToSwapState(parsedQs, chainId)
 
     dispatch(
       replaceSwapState({
@@ -298,7 +391,10 @@ export function useDefaultsFromURLSearch():
       })
     )
 
-    setResult({ inputCurrencyId: parsed[Field.INPUT].currencyId, outputCurrencyId: parsed[Field.OUTPUT].currencyId })
+    setResult({
+      inputCurrencyId: parsed[Field.INPUT].currencyId,
+      outputCurrencyId: parsed[Field.OUTPUT].currencyId,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, chainId])
 

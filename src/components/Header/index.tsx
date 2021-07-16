@@ -1,329 +1,365 @@
-import { Trans } from '@lingui/macro'
-import useScrollPosition from '@react-hook/window-scroll'
-import { darken } from 'polished'
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { Text } from 'rebass'
-import { useETHBalances } from 'state/wallet/hooks'
-import styled from 'styled-components/macro'
-import Logo from '../../assets/images/logo.png'
-import LogoMobilePNG from '../../assets/images/logo-mobile.png'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { ExternalLink } from '../../theme'
-import Menu from '../Menu'
-import Modal from '../Modal'
-import Row, { RowFixed } from '../Row'
+import { ChainId, Currency, NATIVE, SUSHI_ADDRESS } from '@sushiswap/sdk'
+import React, { useEffect, useState } from 'react'
+
+import { ANALYTICS_URL } from '../../constants'
+import Buy from '../../features/ramp'
+import ExternalLink from '../ExternalLink'
+import Image from 'next/image'
+import LanguageSwitch from '../LanguageSwitch'
+import Link from 'next/link'
+import More from './More'
+import NavLink from '../NavLink'
+import { Popover } from '@headlessui/react'
+import QuestionHelper from '../QuestionHelper'
+import Web3Network from '../Web3Network'
 import Web3Status from '../Web3Status'
-import UniBalanceContent from './UniBalanceContent'
-import NAV_ITEMS from './NavItems'
+import { t } from '@lingui/macro'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { useETHBalances } from '../../state/wallet/hooks'
+import { useLingui } from '@lingui/react'
 
-const HeaderFrame = styled.div<{ showBackground: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0px auto;
-  padding: 0px 15px;
-  width: 100%;
-  max-width: 1280px;
-  top: 0;
-  position: relative;
-`
+// import { ExternalLink, NavLink } from "./Link";
+// import { ReactComponent as Burger } from "../assets/images/burger.svg";
 
-const HeaderControls = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-self: flex-end;
-
-  @media (min-width: 992px) {
-    margin-left: 2rem;
-  }
-`
-
-const HeaderElement = styled.div`
-  display: flex;
-  align-items: center;
-
-  /* addresses safari's lack of support for "gap" */
-  & > *:not(:first-child) {
-    margin-left: 8px;
-  }
-
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    flex-direction: row-reverse;
-    align-items: center;
-  `};
-`
-
-const HeaderRow = styled(RowFixed)`
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-   width: 100%;
-  `};
-`
-
-const HeaderLinks = styled(Row)`
-  display: none;
-  justify-self: center;
-  width: fit-content;
-  padding: 4px;
-  border-radius: 16px;
-  grid-auto-flow: column;
-  grid-gap: 10px;
-
-  @media (min-width: 992px) {
-    display: flex;
-  }
-`
-
-const HeaderRightCol = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const AccountElement = styled.div<{ active: boolean }>`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: ${({ theme, active }) => (!active ? theme.bg1 : theme.bg2)};
-  border-radius: 12px;
-  white-space: nowrap;
-  width: 100%;
-  cursor: pointer;
-
-  :focus {
-    border: 1px solid blue;
-  }
-`
-
-const BalanceText = styled(Text)`
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    display: none;
-  `};
-`
-
-const Title = styled.a`
-  display: flex;
-  align-items: center;
-  pointer-events: auto;
-  justify-self: flex-start;
-  margin-right: 12px;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    justify-self: center;
-  `};
-  :hover {
-    cursor: pointer;
-  }
-`
-
-const LogoDesktop = styled.img`
-  display: none;
-
-  @media (min-width: 992px) {
-    display: block;
-  }
-`
-
-const LogoMobile = styled.img`
-  display: block;
-
-  @media (min-width: 992px) {
-    display: none;
-  }
-`
-
-const activeClassName = 'ACTIVE'
-
-const StyledNavLink = styled(NavLink).attrs({
-  activeClassName,
-})`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: left;
-  border-radius: 3rem;
-  outline: none;
-  cursor: pointer;
-  text-decoration: none;
-  color: ${({ theme }) => theme.text2};
-  font-size: 1rem;
-  width: fit-content;
-  font-weight: 500;
-  padding: 8px 12px;
-  word-break: break-word;
-
-  &.${activeClassName} {
-    border-radius: 12px;
-    font-weight: 600;
-    color: ${({ theme }) => theme.text1};
-    background-color: ${({ theme }) => theme.bg2};
-  }
-
-  :hover,
-  :focus {
-    color: ${({ theme }) => darken(0.1, theme.text1)};
-  }
-`
-
-const StyledExternalLink = styled(ExternalLink).attrs({
-  activeClassName,
-})<{ isActive?: boolean }>`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: left;
-  border-radius: 3rem;
-  outline: none;
-  cursor: pointer;
-  text-decoration: none;
-  color: ${({ theme }) => theme.text2};
-  font-size: 1rem;
-  width: fit-content;
-  margin: 0 12px;
-  font-weight: 500;
-
-  &.${activeClassName} {
-    border-radius: 12px;
-    font-weight: 600;
-    color: ${({ theme }) => theme.text1};
-  }
-
-  :hover,
-  :focus {
-    color: ${({ theme }) => darken(0.1, theme.text1)};
-    text-decoration: none;
-  }
-
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-      display: none;
-`}
-`
-
-const StyledMenuButton = styled.button`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background-color: transparent;
-  margin: 0;
-  padding: 0;
-  height: 35px;
-  background-color: ${({ theme }) => theme.bg2};
-  margin-left: 8px;
-  padding: 0.15rem 0.5rem;
-  border-radius: 0.5rem;
-
-  :hover,
-  :focus {
-    cursor: pointer;
-    outline: none;
-    background-color: ${({ theme }) => theme.bg4};
-  }
-
-  svg {
-    margin-top: 2px;
-  }
-  > * {
-    stroke: ${({ theme }) => theme.text1};
-  }
-`
-const MenuItem = styled.div`
-  position: relative;
-  padding: 0 20px;
-`
-
-const MenuLink = styled.a`
-  position: relative;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: #fff;
-  text-decoration: none;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    transition: all 400ms ease;
-    background-color: ${(props) => props.theme.pink};
-  }
-
-  &:hover {
-    color: ${(props) => props.theme.pink};
-
-    &::before {
-      width: 100%;
-    }
-  }
-`
-
-export default function Header() {
-  const { account } = useActiveWeb3React()
+function AppBar(): JSX.Element {
+  const { i18n } = useLingui()
+  const { account, chainId, library } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
 
-  const [showUniBalanceModal, setShowUniBalanceModal] = useState(false)
-
-  const scrollY = useScrollPosition()
-
   return (
-    <HeaderFrame showBackground={scrollY > 45}>
-      <Modal isOpen={showUniBalanceModal} onDismiss={() => setShowUniBalanceModal(false)}>
-        <UniBalanceContent setShowUniBalanceModal={setShowUniBalanceModal} />
-      </Modal>
-      <HeaderRow>
-        <Title href=".">
-          <LogoDesktop src={Logo} alt="DotOracle" />
-          <LogoMobile src={LogoMobilePNG} alt="DotOracle" />
-        </Title>
-      </HeaderRow>
+    //     // <header className="flex flex-row justify-between w-screen flex-nowrap">
+    <header className="flex-shrink-0 w-full">
+      <Popover as="nav" className="z-10 w-full bg-transparent header-border-b">
+        {({ open }) => (
+          <>
+            <div className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Image src="/logo.png" alt="Sushi" width="32px" height="32px" />
+                  <div className="hidden sm:block sm:ml-4">
+                    <div className="flex space-x-2">
+                      {/* <Buy /> */}
+                      <NavLink href="/swap">
+                        <a
+                          id={`swap-nav-link`}
+                          className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                        >
+                          {i18n._(t`Swap`)}
+                        </a>
+                      </NavLink>
+                      <NavLink href="/pool">
+                        <a
+                          id={`pool-nav-link`}
+                          className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                        >
+                          {i18n._(t`Pool`)}
+                        </a>
+                      </NavLink>
+                      {chainId && [ChainId.MAINNET, ChainId.MATIC, ChainId.BSC].includes(chainId) && (
+                        <NavLink href={'/migrate'}>
+                          <a
+                            id={`migrate-nav-link`}
+                            className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                          >
+                            {i18n._(t`Migrate`)}
+                          </a>
+                        </NavLink>
+                      )}
+                      {chainId && [ChainId.MAINNET, ChainId.MATIC, ChainId.XDAI, ChainId.HARMONY].includes(chainId) && (
+                        <NavLink href={'/farm'}>
+                          <a
+                            id={`farm-nav-link`}
+                            className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                          >
+                            {i18n._(t`Farm`)}
+                          </a>
+                        </NavLink>
+                      )}
+                      {chainId && [ChainId.MAINNET, ChainId.KOVAN, ChainId.BSC, ChainId.MATIC].includes(chainId) && (
+                        <>
+                          <NavLink href={'/lend'}>
+                            <a
+                              id={`lend-nav-link`}
+                              className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                            >
+                              {i18n._(t`Lend`)}
+                            </a>
+                          </NavLink>
+                          <NavLink href={'/borrow'}>
+                            <a
+                              id={`borrow-nav-link`}
+                              className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                            >
+                              {i18n._(t`Borrow`)}
+                            </a>
+                          </NavLink>
+                          {/* <Link href={'/bento'}>
+                                                            <a
+                                                                id={`bento-nav-link`}
+                                                                className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                                                            >
+                                                                {i18n._(t`BentoBox`)}
+                                                            </a>
+                                                        </Link> */}
+                        </>
+                      )}
+                      {chainId === ChainId.MAINNET && (
+                        <NavLink href={'/stake'}>
+                          <a
+                            id={`stake-nav-link`}
+                            className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                          >
+                            {i18n._(t`Stake`)}
+                          </a>
+                        </NavLink>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-      <HeaderRightCol>
-        <HeaderLinks>
-          {NAV_ITEMS.map((navItem) => {
-            return (
-              <MenuItem key={navItem.label}>
-                <MenuLink href={navItem.href ?? '#'} target={navItem.target ?? '_self'}>
-                  {navItem.label}
-                </MenuLink>
-              </MenuItem>
-            )
-          })}
-          {/* <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-            <Trans>Swap</Trans>
-          </StyledNavLink>
-          <StyledNavLink
-            id={`pool-nav-link`}
-            to={'/pool'}
-            isActive={(match, { pathname }) =>
-              Boolean(match) ||
-              pathname.startsWith('/add') ||
-              pathname.startsWith('/remove') ||
-              pathname.startsWith('/increase') ||
-              pathname.startsWith('/find')
-            }
-          >
-            <Trans>Pool</Trans>
-          </StyledNavLink>
-          <StyledNavLink id={`stake-nav-link`} to={'/vote'}>
-            <Trans>Vote</Trans>
-          </StyledNavLink>
-          <StyledExternalLink id={`stake-nav-link`} href={'https://info.uniswap.org'}>
-            <Trans>Charts</Trans>
-            <sup>↗</sup>
-          </StyledExternalLink> */}
-        </HeaderLinks>
-        <HeaderControls>
-          <HeaderElement>
-            <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
-              {account && userEthBalance ? (
-                <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                  <Trans>{userEthBalance?.toSignificant(4)} ETH</Trans>
-                </BalanceText>
-              ) : null}
-              <Web3Status />
-            </AccountElement>
-          </HeaderElement>
-        </HeaderControls>
-        <Menu />
-      </HeaderRightCol>
-    </HeaderFrame>
+                <div className="fixed bottom-0 left-0 z-10 flex flex-row items-center justify-center w-full p-4 lg:w-auto bg-dark-1000 lg:relative lg:p-0 lg:bg-transparent">
+                  <div className="flex items-center justify-between w-full space-x-2 sm:justify-end">
+                    {chainId && [ChainId.MAINNET].includes(chainId) && library && library.provider.isMetaMask && (
+                      <>
+                        <QuestionHelper text={i18n._(t`Add xSUSHI to your MetaMask wallet`)}>
+                          <div
+                            className="hidden p-0.5 rounded-md cursor-pointer sm:inline-flex bg-dark-900 hover:bg-dark-800"
+                            onClick={() => {
+                              if (library && library.provider.isMetaMask && library.provider.request) {
+                                const params: any = {
+                                  type: 'ERC20',
+                                  options: {
+                                    address: '0x8798249c2e607446efb7ad49ec89dd1865ff4272',
+                                    symbol: 'XSUSHI',
+                                    decimals: 18,
+                                    image:
+                                      'https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/ethereum/assets/0x8798249c2E607446EfB7Ad49eC89dD1865Ff4272/logo.png',
+                                  },
+                                }
+                                library.provider
+                                  .request({
+                                    method: 'wallet_watchAsset',
+                                    params,
+                                  })
+                                  .then((success) => {
+                                    if (success) {
+                                      console.log('Successfully added XSUSHI to MetaMask')
+                                    } else {
+                                      throw new Error('Something went wrong.')
+                                    }
+                                  })
+                                  .catch(console.error)
+                              }
+                            }}
+                          >
+                            <Image
+                              src="/images/tokens/xsushi-square.jpg"
+                              alt="xSUSHI"
+                              width="38px"
+                              height="38px"
+                              objectFit="contain"
+                              className="rounded-md"
+                            />
+                          </div>
+                        </QuestionHelper>
+                      </>
+                    )}
+
+                    {chainId && chainId in SUSHI_ADDRESS && library && library.provider.isMetaMask && (
+                      <>
+                        <QuestionHelper text={i18n._(t`Add SUSHI to your MetaMask wallet`)}>
+                          <div
+                            className="hidden rounded-md cursor-pointer sm:inline-flex bg-dark-900 hover:bg-dark-800 p-0.5"
+                            onClick={() => {
+                              const params: any = {
+                                type: 'ERC20',
+                                options: {
+                                  address: SUSHI_ADDRESS[chainId],
+                                  symbol: 'SUSHI',
+                                  decimals: 18,
+                                  image:
+                                    'https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/ethereum/assets/0x6B3595068778DD592e39A122f4f5a5cF09C90fE2/logo.png',
+                                },
+                              }
+                              if (library && library.provider.isMetaMask && library.provider.request) {
+                                library.provider
+                                  .request({
+                                    method: 'wallet_watchAsset',
+                                    params,
+                                  })
+                                  .then((success) => {
+                                    if (success) {
+                                      console.log('Successfully added SUSHI to MetaMask')
+                                    } else {
+                                      throw new Error('Something went wrong.')
+                                    }
+                                  })
+                                  .catch(console.error)
+                              }
+                            }}
+                          >
+                            <Image
+                              src="/images/tokens/sushi-square.jpg"
+                              alt="SUSHI"
+                              width="38px"
+                              height="38px"
+                              objectFit="contain"
+                              className="rounded-md"
+                            />
+                          </div>
+                        </QuestionHelper>
+                      </>
+                    )}
+
+                    {library && library.provider.isMetaMask && (
+                      <div className="hidden sm:inline-block">
+                        <Web3Network />
+                      </div>
+                    )}
+
+                    <div className="w-auto flex items-center rounded bg-dark-900 hover:bg-dark-800 p-0.5 whitespace-nowrap text-sm font-bold cursor-pointer select-none pointer-events-auto">
+                      {account && chainId && userEthBalance && (
+                        <>
+                          <div className="px-3 py-2 text-primary text-bold">
+                            {userEthBalance?.toSignificant(4)} {NATIVE[chainId].symbol}
+                          </div>
+                        </>
+                      )}
+                      <Web3Status />
+                    </div>
+                    <div className="hidden md:block">
+                      <LanguageSwitch />
+                    </div>
+                    <More />
+                  </div>
+                </div>
+                <div className="flex -mr-2 sm:hidden">
+                  {/* Mobile menu button */}
+                  <Popover.Button className="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-high-emphesis focus:outline-none">
+                    <span className="sr-only">{i18n._(t`Open main menu`)}</span>
+                    {open ? (
+                      <svg
+                        className="block w-6 h-6"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      // <X title="Close" className="block w-6 h-6" aria-hidden="true" />
+                      <svg
+                        className="block w-6 h-6"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 6h16M4 12h16M4 18h16"
+                        />
+                      </svg>
+                      // <Burger title="Burger" className="block w-6 h-6" aria-hidden="true" />
+                    )}
+                  </Popover.Button>
+                </div>
+              </div>
+            </div>
+
+            <Popover.Panel className="sm:hidden">
+              <div className="flex flex-col px-4 pt-2 pb-3 space-y-1">
+                <Link href={'/swap'}>
+                  <a
+                    id={`swap-nav-link`}
+                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                  >
+                    {i18n._(t`Swap`)}
+                  </a>
+                </Link>
+                <Link href={'/pool'}>
+                  <a
+                    id={`pool-nav-link`}
+                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                  >
+                    {i18n._(t`Pool`)}
+                  </a>
+                </Link>
+
+                <Link href={'/migrate'}>
+                  <a
+                    id={`migrate-nav-link`}
+                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                  >
+                    {i18n._(t`Migrate`)}
+                  </a>
+                </Link>
+
+                {chainId && [ChainId.MAINNET, ChainId.MATIC, ChainId.HARMONY, ChainId.XDAI].includes(chainId) && (
+                  <Link href={'/farm'}>
+                    <a
+                      id={`farm-nav-link`}
+                      className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                    >
+                      {' '}
+                      {i18n._(t`Farm`)}
+                    </a>
+                  </Link>
+                )}
+
+                {chainId && [ChainId.MAINNET, ChainId.KOVAN, ChainId.BSC, ChainId.MATIC].includes(chainId) && (
+                  <>
+                    <Link href={'/lend'}>
+                      <a
+                        id={`lend-nav-link`}
+                        className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                      >
+                        {i18n._(t`Lend`)}
+                      </a>
+                    </Link>
+
+                    <Link href={'/borrow'}>
+                      <a
+                        id={`borrow-nav-link`}
+                        className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                      >
+                        {i18n._(t`Borrow`)}
+                      </a>
+                    </Link>
+                  </>
+                )}
+                {chainId === ChainId.MAINNET && (
+                  <Link href={'/stake'}>
+                    <a
+                      id={`stake-nav-link`}
+                      className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                    >
+                      {i18n._(t`Stake`)}
+                    </a>
+                  </Link>
+                )}
+                {chainId &&
+                  [ChainId.MAINNET, ChainId.BSC, ChainId.XDAI, ChainId.FANTOM, ChainId.MATIC].includes(chainId) && (
+                    <ExternalLink
+                      id={`analytics-nav-link`}
+                      href={ANALYTICS_URL[chainId] || 'https://analytics.sushi.com'}
+                      className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                    >
+                      {i18n._(t`Analytics`)}
+                    </ExternalLink>
+                  )}
+              </div>
+            </Popover.Panel>
+          </>
+        )}
+      </Popover>
+    </header>
   )
 }
+
+export default AppBar

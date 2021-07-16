@@ -1,94 +1,31 @@
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { darken, lighten } from 'polished'
-import { useMemo } from 'react'
-import { Activity } from 'react-feather'
-import { t, Trans } from '@lingui/macro'
-import styled from 'styled-components/macro'
-import { injected } from '../../connectors'
-import { NetworkContextName } from '../../constants/misc'
-import useENSName from '../../hooks/useENSName'
-import { useHasSocks } from '../../hooks/useSocksBalance'
-import { useWalletModalToggle } from '../../state/application/hooks'
+import React, { useMemo } from 'react'
+import { fortmatic, injected, portis, walletconnect, walletlink } from '../../connectors'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
-import { TransactionDetails } from '../../state/transactions/reducer'
-import { shortenAddress } from '../../utils'
-import { ButtonSecondary } from '../Button'
 
-import Identicon from '../Identicon'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import Image from 'next/image'
 import Loader from '../Loader'
+import { NetworkContextName } from '../../constants'
+import { TransactionDetails } from '../../state/transactions/reducer'
+import WalletModal from '../../modals/WalletModal'
+import Web3Connect from '../Web3Connect'
+import { shortenAddress } from '../../functions/format'
+import styled from 'styled-components'
+import { t } from '@lingui/macro'
+import useENSName from '../../hooks/useENSName'
+import { useLingui } from '@lingui/react'
+import { useWalletModalToggle } from '../../state/application/hooks'
+import { useWeb3React } from '@web3-react/core'
 
-import { RowBetween } from '../Row'
-import WalletModal from '../WalletModal'
-
-const Web3StatusGeneric = styled(ButtonSecondary)`
-  ${({ theme }) => theme.flexRowNoWrap}
-  width: 100%;
+const IconWrapper = styled.div<{ size?: number }>`
+  display: flex;
+  flex-flow: column nowrap;
   align-items: center;
-  padding: 0.625rem 1.375rem;
-  border-radius: 4px;
-  cursor: pointer;
-  user-select: none;
-
-  :focus {
-    outline: none;
+  justify-content: center;
+  & > * {
+    height: ${({ size }) => (size ? size + 'px' : '32px')};
+    width: ${({ size }) => (size ? size + 'px' : '32px')};
   }
-`
-const Web3StatusError = styled(Web3StatusGeneric)`
-  background-color: ${({ theme }) => theme.red1};
-  border: 1px solid ${({ theme }) => theme.red1};
-  color: ${({ theme }) => theme.white};
-  font-weight: 500;
-  :hover,
-  :focus {
-    background-color: ${({ theme }) => darken(0.1, theme.red1)};
-  }
-`
-
-const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
-  background-color: ${({ theme }) => theme.pink};
-  color: ${({ theme }) => theme.white};
-  text-transform: uppercase;
-  padding-left: 12px;
-  padding-right: 12px;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.pink2};
-    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 15%), 0 2px 2px -1px rgb(0 0 0 / 30%);
-  }
-`
-
-const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
-  background-color: ${({ pending, theme }) => (pending ? theme.primary1 : theme.bg1)};
-  border: 1px solid ${({ pending, theme }) => (pending ? theme.primary1 : theme.bg2)};
-  color: ${({ pending, theme }) => (pending ? theme.white : theme.text1)};
-  font-weight: 500;
-  :hover,
-  :focus {
-    background-color: ${({ pending, theme }) => (pending ? darken(0.05, theme.primary1) : lighten(0.05, theme.bg1))};
-
-    :focus {
-      border: 1px solid ${({ pending, theme }) => (pending ? darken(0.1, theme.primary1) : darken(0.1, theme.bg2))};
-    }
-  }
-`
-
-const Text = styled.p`
-  flex: 1 1 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  width: fit-content;
-`
-
-const NetworkIcon = styled(Activity)`
-  margin-left: 0.25rem;
-  margin-right: 0.5rem;
-  width: 16px;
-  height: 16px;
 `
 
 // we want the latest one to come first, so return negative if a is after b
@@ -96,25 +33,54 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
   return b.addedTime - a.addedTime
 }
 
-function Sock() {
-  return (
-    <span role="img" aria-label={t`has socks emoji`} style={{ marginTop: -4, marginBottom: -4 }}>
-      🧦
-    </span>
-  )
-}
+const SOCK = (
+  <span role="img" aria-label="has socks emoji" style={{ marginTop: -4, marginBottom: -4 }}>
+    🧦
+  </span>
+)
 
 // eslint-disable-next-line react/prop-types
 function StatusIcon({ connector }: { connector: AbstractConnector }) {
   if (connector === injected) {
-    return <Identicon />
+    return <Image src="/chef.svg" alt="Injected (MetaMask etc...)" width={20} height={20} />
+    // return <Identicon />
+  } else if (connector === walletconnect) {
+    return (
+      <IconWrapper size={16}>
+        <Image src="/images/wallets/wallet-connect.png" alt={'Wallet Connect'} width="16px" height="16px" />
+      </IconWrapper>
+    )
+  } else if (connector.constructor.name === 'LatticeConnector') {
+    return (
+      <IconWrapper size={16}>
+        <Image src="/images/wallets/lattice.png" alt={'Lattice'} width="16px" height="16px" />
+      </IconWrapper>
+    )
+  } else if (connector === walletlink) {
+    return (
+      <IconWrapper size={16}>
+        <Image src="/images/wallets/coinbase.svg" alt={'Coinbase Wallet'} width="16px" height="16px" />
+      </IconWrapper>
+    )
+  } else if (connector === fortmatic) {
+    return (
+      <IconWrapper size={16}>
+        <Image src="/images/wallets/fortmatic.png" alt={'Fortmatic'} width="16px" height="16px" />
+      </IconWrapper>
+    )
+  } else if (connector === portis) {
+    return (
+      <IconWrapper size={16}>
+        <Image src="/images/wallets/portis.png" alt={'Portis'} width="16px" height="16px" />
+      </IconWrapper>
+    )
   }
   return null
 }
 
 function Web3StatusInner() {
-  console.log()
-  const { account, connector, error } = useWeb3React()
+  const { i18n } = useLingui()
+  const { account, connector } = useWeb3React()
 
   const { ENSName } = useENSName(account ?? undefined)
 
@@ -125,46 +91,44 @@ function Web3StatusInner() {
     return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
   }, [allTransactions])
 
-  const pending = sortedRecentTransactions.filter((tx) => !tx.receipt).map((tx) => tx.hash)
+  const pending = sortedRecentTransactions
+    .filter((tx) => {
+      if (tx.receipt) {
+        return false
+      } else if (tx.archer && tx.archer.deadline * 1000 - Date.now() < 0) {
+        return false
+      } else {
+        return true
+      }
+    })
+    .map((tx) => tx.hash)
 
   const hasPendingTransactions = !!pending.length
-  const hasSocks = useHasSocks()
+
   const toggleWalletModal = useWalletModalToggle()
 
   if (account) {
     return (
-      <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
+      <div
+        id="web3-status-connected"
+        className="flex items-center px-3 py-2 text-sm rounded-lg bg-dark-1000 text-secondary"
+        onClick={toggleWalletModal}
+      >
         {hasPendingTransactions ? (
-          <RowBetween>
-            <Text>
-              <Trans>{pending?.length} Pending</Trans>
-            </Text>{' '}
+          <div className="flex items-center justify-between">
+            <div className="pr-2">
+              {pending?.length} {i18n._(t`Pending`)}
+            </div>{' '}
             <Loader stroke="white" />
-          </RowBetween>
+          </div>
         ) : (
-          <>
-            {hasSocks ? <Sock /> : null}
-            <Text>{ENSName || shortenAddress(account)}</Text>
-          </>
+          <div className="mr-2">{ENSName || shortenAddress(account)}</div>
         )}
         {!hasPendingTransactions && connector && <StatusIcon connector={connector} />}
-      </Web3StatusConnected>
-    )
-  } else if (error) {
-    return (
-      <Web3StatusError onClick={toggleWalletModal}>
-        <NetworkIcon />
-        <Text>{error instanceof UnsupportedChainIdError ? <Trans>Wrong Network</Trans> : <Trans>Error</Trans>}</Text>
-      </Web3StatusError>
+      </div>
     )
   } else {
-    return (
-      <Web3StatusConnect id="connect-wallet" onClick={toggleWalletModal} faded={!account}>
-        <Text>
-          <Trans>Connect Wallet</Trans>
-        </Text>
-      </Web3StatusConnect>
-    )
+    return <Web3Connect style={{ paddingTop: '6px', paddingBottom: '6px' }} />
   }
 }
 

@@ -1,18 +1,18 @@
-import { parseBytes32String } from '@ethersproject/strings'
-import { Currency, Token } from '@uniswap/sdk-core'
-import { arrayify } from 'ethers/lib/utils'
-import { useMemo } from 'react'
-import { createTokenFilterFunction } from '../components/SearchModal/filtering'
-import { ExtendedEther, WETH9_EXTENDED } from '../constants/tokens'
-import { useAllLists, useCombinedActiveList, useInactiveListUrls } from '../state/lists/hooks'
-import { WrappedTokenInfo } from '../state/lists/wrappedTokenInfo'
+import { ChainId, Currency, NATIVE, Token, WNATIVE, currencyEquals } from '@sushiswap/sdk'
+import { ExtendedEther, WETH9_EXTENDED } from '../constants'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
-import { useUserAddedTokens } from '../state/user/hooks'
-import { isAddress } from '../utils'
-import { TokenAddressMap, useUnsupportedTokenList } from './../state/lists/hooks'
-
-import { useActiveWeb3React } from './web3'
+import { TokenAddressMap, useAllLists, useInactiveListUrls, useUnsupportedTokenList } from './../state/lists/hooks'
+import { createTokenFilterFunction, filterTokens } from '../functions/filtering'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
+
+import { WrappedTokenInfo } from './../state/lists/wrappedTokenInfo'
+import { arrayify } from 'ethers/lib/utils'
+import { isAddress } from '../functions/validate'
+import { parseBytes32String } from '@ethersproject/strings'
+import { useActiveWeb3React } from './useActiveWeb3React'
+import { useCombinedActiveList } from '../state/lists/hooks'
+import { useMemo } from 'react'
+import { useUserAddedTokens } from '../state/user/hooks'
 
 // reduce token map into standard address <-> Token mapping, optionally include user added tokens
 function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
@@ -23,13 +23,12 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
     if (!chainId) return {}
 
     // reduce to just tokens
-    const mapWithoutUrls = Object.keys(tokenMap[chainId] ?? {}).reduce<{ [address: string]: Token }>(
-      (newMap, address) => {
-        newMap[address] = tokenMap[chainId][address].token
-        return newMap
-      },
-      {}
-    )
+    const mapWithoutUrls = Object.keys(tokenMap[chainId]).reduce<{
+      [address: string]: Token
+    }>((newMap, address) => {
+      newMap[address] = tokenMap[chainId][address].token
+      return newMap
+    }, {})
 
     if (includeUserAdded) {
       return (
@@ -54,6 +53,11 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
 export function useAllTokens(): { [address: string]: Token } {
   const allTokens = useCombinedActiveList()
   return useTokensFromMap(allTokens, true)
+}
+
+export function useTokens(): { [address: string]: Token } {
+  const allTokens = useCombinedActiveList()
+  return useTokensFromMap(allTokens, false)
 }
 
 export function useUnsupportedTokens(): { [address: string]: Token } {
@@ -177,10 +181,27 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
 
 export function useCurrency(currencyId: string | undefined): Currency | null | undefined {
   const { chainId } = useActiveWeb3React()
+
   const isETH = currencyId?.toUpperCase() === 'ETH'
-  const token = useToken(isETH ? undefined : currencyId)
-  const extendedEther = useMemo(() => (chainId ? ExtendedEther.onChain(chainId) : undefined), [chainId])
-  const weth = chainId ? WETH9_EXTENDED[chainId] : undefined
-  if (weth?.address?.toLowerCase() === currencyId?.toLowerCase()) return weth
-  return isETH ? extendedEther : token
+
+  const isDual = [ChainId.CELO].includes(chainId)
+
+  const useNative = isETH && !isDual
+
+  if (isETH && isDual) {
+    currencyId = WNATIVE[chainId].address
+  }
+
+  const token = useToken(useNative ? undefined : currencyId)
+
+  // const extendedEther = useMemo(() => (chainId ? ExtendedEther.onChain(chainId) : undefined), [chainId])
+  // const weth = chainId ? WETH9_EXTENDED[chainId] : undefined
+
+  const native = useMemo(() => (chainId ? NATIVE[chainId] : undefined), [chainId])
+
+  const wnative = chainId ? WNATIVE[chainId] : undefined
+
+  if (wnative?.address?.toLowerCase() === currencyId?.toLowerCase()) return wnative
+
+  return useNative ? native : token
 }

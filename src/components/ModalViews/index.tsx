@@ -1,16 +1,14 @@
-import { useContext } from 'react'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { ExplorerDataType, getExplorerLink } from '../../utils/getExplorerLink'
-
 import { AutoColumn, ColumnCenter } from '../Column'
-import styled, { ThemeContext } from 'styled-components/macro'
-import { RowBetween } from '../Row'
-import { TYPE, CloseIcon, CustomLightSpinner } from '../../theme'
-import { ArrowUpCircle } from 'react-feather'
-import { Trans } from '@lingui/macro'
+import React, { useContext } from 'react'
+import styled, { ThemeContext } from 'styled-components'
 
-import Circle from '../../assets/images/blue-loader.svg'
-import { ExternalLink } from '../../theme/components'
+import { ArrowUpCircle } from 'react-feather'
+import CloseIcon from '../CloseIcon'
+import { CustomLightSpinner } from '../Spinner'
+import ExternalLink from '../ExternalLink'
+import { RowBetween } from '../Row'
+import { getExplorerLink } from '../../functions/explorer'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
 
 const ConfirmOrLoadingWrapper = styled.div`
   width: 100%;
@@ -29,13 +27,11 @@ export function LoadingView({ children, onDismiss }: { children: any; onDismiss:
         <CloseIcon onClick={onDismiss} />
       </RowBetween>
       <ConfirmedIcon>
-        <CustomLightSpinner src={Circle} alt="loader" size={'90px'} />
+        <CustomLightSpinner src="/blue-loader.svg" alt="loader" size={'90px'} />
       </ConfirmedIcon>
       <AutoColumn gap="100px" justify={'center'}>
         {children}
-        <TYPE.subHeader>
-          <Trans>Confirm this transaction in your wallet</Trans>
-        </TYPE.subHeader>
+        <div>Confirm this transaction in your wallet</div>
       </AutoColumn>
     </ConfirmOrLoadingWrapper>
   )
@@ -60,18 +56,13 @@ export function SubmittedView({
         <CloseIcon onClick={onDismiss} />
       </RowBetween>
       <ConfirmedIcon>
-        <ArrowUpCircle strokeWidth={0.5} size={90} color={theme.primary1} />
+        <ArrowUpCircle strokeWidth={0.5} size={90} color="currentColor" />
       </ConfirmedIcon>
       <AutoColumn gap="100px" justify={'center'}>
         {children}
         {chainId && hash && (
-          <ExternalLink
-            href={getExplorerLink(chainId, hash, ExplorerDataType.TRANSACTION)}
-            style={{ marginLeft: '4px' }}
-          >
-            <TYPE.subHeader>
-              <Trans>View transaction on Explorer</Trans>
-            </TYPE.subHeader>
+          <ExternalLink href={getExplorerLink(chainId, hash, 'transaction')} style={{ marginLeft: '4px' }}>
+            <div>View transaction on explorer</div>
           </ExternalLink>
         )}
       </AutoColumn>

@@ -1,48 +1,49 @@
-import { DEFAULT_DEADLINE_FROM_NOW } from '../../constants/misc'
-import { createReducer } from '@reduxjs/toolkit'
-import { updateVersion } from '../global/actions'
 import {
+  DEFAULT_ARCHER_ETH_TIP,
+  DEFAULT_ARCHER_GAS_ESTIMATE,
+  DEFAULT_ARCHER_GAS_PRICES,
+  DEFAULT_DEADLINE_FROM_NOW,
+  INITIAL_ALLOWED_SLIPPAGE,
+} from '../../constants'
+import {
+  SerializedPair,
+  SerializedToken,
   addSerializedPair,
   addSerializedToken,
   removeSerializedPair,
   removeSerializedToken,
-  SerializedPair,
-  SerializedToken,
+  toggleURLWarning,
   updateMatchesDarkMode,
+  updateUserArcherETHTip,
+  updateUserArcherGasEstimate,
+  updateUserArcherGasPrice,
+  updateUserArcherTipManualOverride,
+  updateUserArcherUseRelay,
   updateUserDarkMode,
-  updateUserExpertMode,
-  updateUserSlippageTolerance,
   updateUserDeadline,
+  updateUserExpertMode,
   updateUserSingleHopOnly,
-  updateHideClosedPositions,
-  updateUserLocale,
-  updateArbitrumAlphaAcknowledged,
+  updateUserSlippageTolerance,
 } from './actions'
-import { SupportedLocale } from 'constants/locales'
+
+import { createReducer } from '@reduxjs/toolkit'
+import { updateVersion } from '../global/actions'
 
 const currentTimestamp = () => new Date().getTime()
 
 export interface UserState {
-  arbitrumAlphaAcknowledged: boolean
-
   // the timestamp of the last updateVersion action
   lastUpdateVersionTimestamp?: number
 
   userDarkMode: boolean | null // the user's choice for dark mode or light mode
   matchesDarkMode: boolean // whether the dark mode media query matches
 
-  userLocale: SupportedLocale | null
-
   userExpertMode: boolean
 
   userSingleHopOnly: boolean // only allow swaps on direct pairs
 
-  // hides closed (inactive) positions across the app
-  userHideClosedPositions: boolean
-
   // user defined slippage tolerance in bips, used in all txns
   userSlippageTolerance: number | 'auto'
-  userSlippageToleranceHasBeenMigratedToAuto: boolean // temporary flag for migration status
 
   // deadline set by user in minutes, used in all txns
   userDeadline: number
@@ -62,6 +63,12 @@ export interface UserState {
 
   timestamp: number
   URLWarningVisible: boolean
+
+  userArcherUseRelay: boolean // use relay or go directly to router
+  userArcherGasPrice: string // Current gas price
+  userArcherETHTip: string // ETH tip for relay, as full BigInt string
+  userArcherGasEstimate: string // Gas estimate for trade
+  userArcherTipManualOverride: boolean // is user manually entering tip
 }
 
 function pairKey(token0Address: string, token1Address: string) {
@@ -69,20 +76,21 @@ function pairKey(token0Address: string, token1Address: string) {
 }
 
 export const initialState: UserState = {
-  arbitrumAlphaAcknowledged: false,
   userDarkMode: null,
   matchesDarkMode: false,
   userExpertMode: false,
-  userLocale: null,
   userSingleHopOnly: false,
-  userHideClosedPositions: false,
-  userSlippageTolerance: 'auto',
-  userSlippageToleranceHasBeenMigratedToAuto: true,
+  userSlippageTolerance: INITIAL_ALLOWED_SLIPPAGE,
   userDeadline: DEFAULT_DEADLINE_FROM_NOW,
   tokens: {},
   pairs: {},
   timestamp: currentTimestamp(),
   URLWarningVisible: true,
+  userArcherUseRelay: false,
+  userArcherGasPrice: DEFAULT_ARCHER_GAS_PRICES[4].toString(),
+  userArcherETHTip: DEFAULT_ARCHER_ETH_TIP.toString(),
+  userArcherGasEstimate: DEFAULT_ARCHER_GAS_ESTIMATE.toString(),
+  userArcherTipManualOverride: false,
 }
 
 export default createReducer(initialState, (builder) =>
@@ -90,31 +98,13 @@ export default createReducer(initialState, (builder) =>
     .addCase(updateVersion, (state) => {
       // slippage isnt being tracked in local storage, reset to default
       // noinspection SuspiciousTypeOfGuard
-      if (
-        typeof state.userSlippageTolerance !== 'number' ||
-        !Number.isInteger(state.userSlippageTolerance) ||
-        state.userSlippageTolerance < 0 ||
-        state.userSlippageTolerance > 5000
-      ) {
-        state.userSlippageTolerance = 'auto'
-      } else {
-        if (
-          !state.userSlippageToleranceHasBeenMigratedToAuto &&
-          [10, 50, 100].indexOf(state.userSlippageTolerance) !== -1
-        ) {
-          state.userSlippageTolerance = 'auto'
-          state.userSlippageToleranceHasBeenMigratedToAuto = true
-        }
+      if (typeof state.userSlippageTolerance !== 'number') {
+        state.userSlippageTolerance = INITIAL_ALLOWED_SLIPPAGE
       }
 
       // deadline isnt being tracked in local storage, reset to default
       // noinspection SuspiciousTypeOfGuard
-      if (
-        typeof state.userDeadline !== 'number' ||
-        !Number.isInteger(state.userDeadline) ||
-        state.userDeadline < 60 ||
-        state.userDeadline > 180 * 60
-      ) {
+      if (typeof state.userDeadline !== 'number') {
         state.userDeadline = DEFAULT_DEADLINE_FROM_NOW
       }
 
@@ -128,15 +118,8 @@ export default createReducer(initialState, (builder) =>
       state.matchesDarkMode = action.payload.matchesDarkMode
       state.timestamp = currentTimestamp()
     })
-    .addCase(updateArbitrumAlphaAcknowledged, (state, action) => {
-      state.arbitrumAlphaAcknowledged = action.payload.arbitrumAlphaAcknowledged
-    })
     .addCase(updateUserExpertMode, (state, action) => {
       state.userExpertMode = action.payload.userExpertMode
-      state.timestamp = currentTimestamp()
-    })
-    .addCase(updateUserLocale, (state, action) => {
-      state.userLocale = action.payload.userLocale
       state.timestamp = currentTimestamp()
     })
     .addCase(updateUserSlippageTolerance, (state, action) => {
@@ -150,21 +133,12 @@ export default createReducer(initialState, (builder) =>
     .addCase(updateUserSingleHopOnly, (state, action) => {
       state.userSingleHopOnly = action.payload.userSingleHopOnly
     })
-    .addCase(updateHideClosedPositions, (state, action) => {
-      state.userHideClosedPositions = action.payload.userHideClosedPositions
-    })
     .addCase(addSerializedToken, (state, { payload: { serializedToken } }) => {
-      if (!state.tokens) {
-        state.tokens = {}
-      }
       state.tokens[serializedToken.chainId] = state.tokens[serializedToken.chainId] || {}
       state.tokens[serializedToken.chainId][serializedToken.address] = serializedToken
       state.timestamp = currentTimestamp()
     })
     .addCase(removeSerializedToken, (state, { payload: { address, chainId } }) => {
-      if (!state.tokens) {
-        state.tokens = {}
-      }
       state.tokens[chainId] = state.tokens[chainId] || {}
       delete state.tokens[chainId][address]
       state.timestamp = currentTimestamp()
@@ -187,5 +161,23 @@ export default createReducer(initialState, (builder) =>
         delete state.pairs[chainId][pairKey(tokenBAddress, tokenAAddress)]
       }
       state.timestamp = currentTimestamp()
+    })
+    .addCase(toggleURLWarning, (state) => {
+      state.URLWarningVisible = !state.URLWarningVisible
+    })
+    .addCase(updateUserArcherUseRelay, (state, action) => {
+      state.userArcherUseRelay = action.payload.userArcherUseRelay
+    })
+    .addCase(updateUserArcherGasPrice, (state, action) => {
+      state.userArcherGasPrice = action.payload.userArcherGasPrice
+    })
+    .addCase(updateUserArcherETHTip, (state, action) => {
+      state.userArcherETHTip = action.payload.userArcherETHTip
+    })
+    .addCase(updateUserArcherGasEstimate, (state, action) => {
+      state.userArcherGasEstimate = action.payload.userArcherGasEstimate
+    })
+    .addCase(updateUserArcherTipManualOverride, (state, action) => {
+      state.userArcherTipManualOverride = action.payload.userArcherTipManualOverride
     })
 )

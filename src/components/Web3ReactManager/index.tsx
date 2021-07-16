@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react'
-import { useWeb3React } from '@web3-react/core'
-import styled from 'styled-components/macro'
-import { Trans } from '@lingui/macro'
-
-import { network } from '../../connectors'
-import { useEagerConnect, useInactiveListener } from '../../hooks/web3'
-import { NetworkContextName } from '../../constants/misc'
+import React, { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Loader from '../Loader'
+import { NetworkContextName } from '../../constants'
+import { network } from '../../connectors'
+import styled from 'styled-components'
+import { t } from '@lingui/macro'
+import useEagerConnect from '../../hooks/useEagerConnect'
+import useInactiveListener from '../../hooks/useInactiveListener'
+import { useLingui } from '@lingui/react'
+import { useWeb3React } from '@web3-react/core'
 
 const MessageWrapper = styled.div`
   display: flex;
@@ -16,10 +18,15 @@ const MessageWrapper = styled.div`
 `
 
 const Message = styled.h2`
-  color: ${({ theme }) => theme.secondary1};
+  // color: ${({ theme }) => theme.secondary1};
 `
 
+const GnosisManagerNoSSR = dynamic(() => import('./GnosisManager'), {
+  ssr: false,
+})
+
 export default function Web3ReactManager({ children }: { children: JSX.Element }) {
+  const { i18n } = useLingui()
   const { active } = useWeb3React()
   const { active: networkActive, error: networkError, activate: activateNetwork } = useWeb3React(NetworkContextName)
 
@@ -57,11 +64,9 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
   if (!active && networkError) {
     return (
       <MessageWrapper>
-        <Message>
-          <Trans>
-            Oops! An unknown error occurred. Please refresh the page, or visit from another browser or device.
-          </Trans>
-        </Message>
+        <div className="text-secondary">
+          {i18n._(t`Oops! An unknown error occurred. Please refresh the page, or visit from another browser or device`)}
+        </div>
       </MessageWrapper>
     )
   }
@@ -75,5 +80,10 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
     ) : null
   }
 
-  return children
+  return (
+    <>
+      <GnosisManagerNoSSR />
+      {children}
+    </>
+  )
 }

@@ -1,18 +1,19 @@
-import styled from 'styled-components/macro'
-import { useActivePopups } from '../../state/application/hooks'
 import { AutoColumn } from '../Column'
 import PopupItem from './PopupItem'
+import React from 'react'
+import styled from 'styled-components'
+import { useActivePopups } from '../../state/application/hooks'
 import { useURLWarningVisible } from '../../state/user/hooks'
 
 const MobilePopupWrapper = styled.div<{ height: string | number }>`
-  position: relative;
-  max-width: 100%;
-  height: ${({ height }) => height};
-  margin: ${({ height }) => (height ? '0 auto;' : 0)};
-  margin-bottom: ${({ height }) => (height ? '20px' : 0)}};
+    position: relative;
+    max-width: 100%;
+    height: ${({ height }) => height};
+    margin: ${({ height }) => (height ? '0 auto;' : 0)};
+    margin-bottom: ${({ height }) => (height ? '20px' : 0)}};
 
-  display: none;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+    // ${({ theme }) => theme.mediaWidth.upToSmall`
     display: block;
   `};
 `
@@ -31,13 +32,13 @@ const MobilePopupInner = styled.div`
 
 const FixedPopupColumn = styled(AutoColumn)<{ extraPadding: boolean }>`
   position: fixed;
-  top: ${({ extraPadding }) => (extraPadding ? '80px' : '88px')};
+  top: ${({ extraPadding }) => (extraPadding ? '108px' : '88px')};
   right: 1rem;
   max-width: 355px !important;
   width: 100%;
   z-index: 3;
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+  // ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `};
 `

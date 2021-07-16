@@ -1,10 +1,11 @@
-import { Currency, Token } from '@uniswap/sdk-core'
+import { Currency, Token } from '@sushiswap/sdk'
 import { Tags, TokenInfo } from '@uniswap/token-lists'
+
 import { TokenList } from '@uniswap/token-lists/dist/types'
-import { isAddress } from '../../utils'
+import { isAddress } from '../../functions/validate'
 
 type TagDetails = Tags[keyof Tags]
-interface TagInfo extends TagDetails {
+export interface TagInfo extends TagDetails {
   id: string
 }
 /**

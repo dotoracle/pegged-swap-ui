@@ -1,17 +1,15 @@
-import { Currency, Token, CurrencyAmount, Ether } from '@uniswap/sdk-core'
-import JSBI from 'jsbi'
-import { useMemo } from 'react'
-import { UNI } from '../../constants/tokens'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { useAllTokens } from '../../hooks/Tokens'
-import { useMulticall2Contract } from '../../hooks/useContract'
-import { isAddress } from '../../utils'
-import { useUserUnclaimedAmount } from '../claim/hooks'
+import { Currency, CurrencyAmount, Ether, JSBI, Token } from '@sushiswap/sdk'
 import { useMultipleContractSingleData, useSingleContractMultipleData } from '../multicall/hooks'
-import { useTotalUniEarned } from '../stake/hooks'
+
+import ERC20_ABI from '../../constants/abis/erc20.json'
 import { Interface } from '@ethersproject/abi'
-import ERC20ABI from 'abis/erc20.json'
-import { Erc20Interface } from 'abis/types/Erc20'
+import { SUSHI } from './../../constants'
+import { isAddress } from '../../functions/validate'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { useAllTokens } from '../../hooks/Tokens'
+import { useMemo } from 'react'
+import { useMulticall2Contract } from '../../hooks/useContract'
+
 /**
  * Returns a map of the given addresses to their eventually consistent ETH balances.
  */
@@ -50,8 +48,6 @@ export function useETHBalances(uncheckedAddresses?: (string | undefined)[]): {
   )
 }
 
-const TOKEN_BALANCE_GAS_OVERRIDE: { [chainId: number]: number } = {}
-
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.
  */
@@ -64,13 +60,16 @@ export function useTokenBalancesWithLoadingIndicator(
     [tokens]
   )
 
-  const { chainId } = useActiveWeb3React()
-
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
-  const ERC20Interface = new Interface(ERC20ABI) as Erc20Interface
-  const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20Interface, 'balanceOf', [address], {
-    gasRequired: (chainId && TOKEN_BALANCE_GAS_OVERRIDE[chainId]) ?? 100_000,
-  })
+  const ERC20Interface = new Interface(ERC20_ABI)
+  const balances = useMultipleContractSingleData(
+    validatedTokenAddresses,
+    ERC20Interface,
+    'balanceOf',
+    [address],
+    undefined,
+    100_000
+  )
 
   const anyLoading: boolean = useMemo(() => balances.some((callState) => callState.loading), [balances])
 
@@ -78,7 +77,9 @@ export function useTokenBalancesWithLoadingIndicator(
     useMemo(
       () =>
         address && validatedTokens.length > 0
-          ? validatedTokens.reduce<{ [tokenAddress: string]: CurrencyAmount<Token> | undefined }>((memo, token, i) => {
+          ? validatedTokens.reduce<{
+              [tokenAddress: string]: CurrencyAmount<Token> | undefined
+            }>((memo, token, i) => {
               const value = balances?.[i]?.result?.[0]
               const amount = value ? JSBI.BigInt(value.toString()) : undefined
               if (amount) {
@@ -137,7 +138,9 @@ export function useCurrencyBalance(account?: string, currency?: Currency): Curre
 }
 
 // mimics useAllBalances
-export function useAllTokenBalances(): { [tokenAddress: string]: CurrencyAmount<Token> | undefined } {
+export function useAllTokenBalances(): {
+  [tokenAddress: string]: CurrencyAmount<Token> | undefined
+} {
   const { account } = useActiveWeb3React()
   const allTokens = useAllTokens()
   const allTokensArray = useMemo(() => Object.values(allTokens ?? {}), [allTokens])
@@ -145,23 +148,31 @@ export function useAllTokenBalances(): { [tokenAddress: string]: CurrencyAmount<
   return balances ?? {}
 }
 
+// TODO: Replace
 // get the total owned, unclaimed, and unharvested UNI for account
-export function useAggregateUniBalance(): CurrencyAmount<Token> | undefined {
-  const { account, chainId } = useActiveWeb3React()
+// export function useAggregateUniBalance(): CurrencyAmount<Token> | undefined {
+//   const { account, chainId } = useActiveWeb3React();
 
-  const uni = chainId ? UNI[chainId] : undefined
+//   const uni = chainId ? UNI[chainId] : undefined;
 
-  const uniBalance: CurrencyAmount<Token> | undefined = useTokenBalance(account ?? undefined, uni)
-  const uniUnclaimed: CurrencyAmount<Token> | undefined = useUserUnclaimedAmount(account)
-  const uniUnHarvested: CurrencyAmount<Token> | undefined = useTotalUniEarned()
+//   const uniBalance: CurrencyAmount<Token> | undefined = useTokenBalance(
+//     account ?? undefined,
+//     uni
+//   );
+//   const uniUnclaimed: CurrencyAmount<Token> | undefined =
+//     useUserUnclaimedAmount(account);
+//   const uniUnHarvested: CurrencyAmount<Token> | undefined = useTotalUniEarned();
 
-  if (!uni) return undefined
+//   if (!uni) return undefined;
 
-  return CurrencyAmount.fromRawAmount(
-    uni,
-    JSBI.add(
-      JSBI.add(uniBalance?.quotient ?? JSBI.BigInt(0), uniUnclaimed?.quotient ?? JSBI.BigInt(0)),
-      uniUnHarvested?.quotient ?? JSBI.BigInt(0)
-    )
-  )
-}
+//   return CurrencyAmount.fromRawAmount(
+//     uni,
+//     JSBI.add(
+//       JSBI.add(
+//         uniBalance?.quotient ?? JSBI.BigInt(0),
+//         uniUnclaimed?.quotient ?? JSBI.BigInt(0)
+//       ),
+//       uniUnHarvested?.quotient ?? JSBI.BigInt(0)
+//     )
+//   );
+// }

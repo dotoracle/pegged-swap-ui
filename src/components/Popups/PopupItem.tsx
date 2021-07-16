@@ -1,13 +1,14 @@
-import { useCallback, useContext, useEffect } from 'react'
-import { X } from 'react-feather'
-import { useSpring } from 'react-spring/web'
-import styled, { ThemeContext } from 'styled-components/macro'
-import { animated } from 'react-spring'
-import { PopupContent } from '../../state/application/actions'
-import { useRemovePopup } from '../../state/application/hooks'
-import TransactionPopup from './TransactionPopup'
+import React, { useCallback, useEffect } from 'react'
 
-const StyledClose = styled(X)`
+import { PopupContent } from '../../state/application/actions'
+import TransactionPopup from './TransactionPopup'
+import { X } from 'react-feather'
+import { animated } from 'react-spring'
+import styled from 'styled-components'
+import { useRemovePopup } from '../../state/application/hooks'
+import { useSpring } from 'react-spring/web'
+
+export const StyledClose = styled(X)`
   position: absolute;
   right: 10px;
   top: 10px;
@@ -16,18 +17,18 @@ const StyledClose = styled(X)`
     cursor: pointer;
   }
 `
-const Popup = styled.div`
+export const Popup = styled.div`
   display: inline-block;
   width: 100%;
   padding: 1em;
-  background-color: ${({ theme }) => theme.bg0};
+  // background-color: ${({ theme }) => theme.bg1};
   position: relative;
   border-radius: 10px;
   padding: 20px;
   padding-right: 35px;
   overflow: hidden;
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+  // ${({ theme }) => theme.mediaWidth.upToSmall`
     min-width: 290px;
     &:not(:last-of-type) {
       margin-right: 20px;
@@ -40,7 +41,7 @@ const Fader = styled.div`
   left: 0px;
   width: 100%;
   height: 2px;
-  background-color: ${({ theme }) => theme.bg3};
+  // background-color: ${({ theme }) => theme.bg3};
 `
 
 const AnimatedFader = animated(Fader)
@@ -68,8 +69,6 @@ export default function PopupItem({
     }
   }, [removeAfterMs, removeThisPopup])
 
-  const theme = useContext(ThemeContext)
-
   let popupContent
   if ('txn' in content) {
     const {
@@ -86,7 +85,7 @@ export default function PopupItem({
 
   return (
     <Popup>
-      <StyledClose color={theme.text2} onClick={removeThisPopup} />
+      <StyledClose onClick={removeThisPopup} />
       {popupContent}
       {removeAfterMs !== null ? <AnimatedFader style={faderStyle} /> : null}
     </Popup>

@@ -1,4 +1,3 @@
-import { createReducer } from '@reduxjs/toolkit'
 import {
   addMulticallListeners,
   errorFetchingMulticallResults,
@@ -6,6 +5,8 @@ import {
   removeMulticallListeners,
   updateMulticallResults,
 } from './actions'
+
+import { createReducer } from '@reduxjs/toolkit'
 import { toCallKey } from './utils'
 
 export interface MulticallState {
@@ -110,8 +111,8 @@ export default createReducer(initialState, (builder) =>
       calls.forEach((call) => {
         const callKey = toCallKey(call)
         const current = state.callResults[chainId][callKey]
-        if (!current || typeof current.fetchingBlockNumber !== 'number') return // only should be dispatched if we are already fetching
-        if (current.fetchingBlockNumber <= fetchingBlockNumber) {
+        if (!current) return // only should be dispatched if we are already fetching
+        if (current.fetchingBlockNumber === fetchingBlockNumber) {
           delete current.fetchingBlockNumber
           current.data = null
           current.blockNumber = fetchingBlockNumber

@@ -1,359 +1,123 @@
-import styled from 'styled-components/macro'
-import { darken } from 'polished'
+import React from 'react'
+import { classNames } from '../../functions'
 
-import { RowBetween } from '../Row'
-import { ChevronDown, Check } from 'react-feather'
-import { Button as RebassButton, ButtonProps as ButtonPropsOriginal } from 'rebass/styled-components'
-import useTheme from 'hooks/useTheme'
+const SIZE = {
+  xs: 'px-2 py-1 text-xs',
+  sm: 'px-4 py-2 text-base',
+  default: 'px-4 py-3 text-base',
+  lg: 'px-6 py-4 text-base',
+  none: 'p-0 text-base',
+}
 
-type ButtonProps = Omit<ButtonPropsOriginal, 'css'>
+const FILLED = {
+  default: 'bg-transparent',
+  red: 'bg-red bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  blue: 'bg-blue bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  pink: 'bg-pink bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  gray: 'border rounded shadow-sm focus:ring-2 focus:ring-offset-2 bg-dark-700 bg-opacity-80 w-full text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80',
+  green: 'bg-green bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  gradient:
+    'w-full text-high-emphesis bg-gradient-to-r from-blue to-pink opacity-80 hover:opacity-100 disabled:bg-opacity-80',
+}
 
-const Base = styled(RebassButton)<
-  {
-    padding?: string
-    width?: string
-    $borderRadius?: string
-    altDisabledStyle?: boolean
-  } & ButtonProps
->`
-  padding: ${({ padding }) => padding ?? '16px'};
-  width: ${({ width }) => width ?? '100%'};
-  font-weight: 500;
-  text-align: center;
-  border-radius: ${({ $borderRadius }) => $borderRadius ?? '20px'};
-  outline: none;
-  border: 1px solid transparent;
-  color: white;
-  text-decoration: none;
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  &:disabled {
-    cursor: auto;
-    pointer-events: none;
-  }
+const OUTLINED = {
+  default: 'bg-transparent',
+  red: 'bg-red bg-opacity-20 outline-red rounded text-red hover:bg-opacity-40 disabled:bg-opacity-20',
+  blue: 'bg-blue bg-opacity-20 outline-blue rounded text-blue hover:bg-opacity-40 disabled:bg-opacity-20',
+  pink: 'bg-pink bg-opacity-20 outline-pink rounded text-pink hover:bg-opacity-40 disabled:bg-opacity-20',
+  gray: 'bg-dark-700 bg-opacity-20 outline-gray rounded text-gray hover:bg-opacity-40 disabled:bg-opacity-20',
+  green: 'bg-green bg-opacity-20 border border-green rounded text-green hover:bg-opacity-40 disabled:bg-opacity-20',
+  gradient: 'bg-gradient-to-r from-blue to-pink opacity-80 hover:opacity-100 disabled:bg-opacity-20',
+}
 
-  transition: all 450ms ease;
+const EMPTY = {
+  default:
+    'flex bg-transparent justify-center items-center disabled:opacity-50 disabled:cursor-auto bg-opacity-80 hover:bg-opacity-100',
+}
 
-  > * {
-    user-select: none;
-  }
+const LINK = {
+  default: 'text-primary hover:text-high-emphesis focus:text-high-emphesis whitespace-nowrap focus:ring-0',
+}
 
-  > a {
-    text-decoration: none;
-  }
-`
+const VARIANT = {
+  outlined: OUTLINED,
+  filled: FILLED,
+  empty: EMPTY,
+  link: LINK,
+}
 
-export const ButtonPrimary = styled(Base)`
-  background-color: ${({ theme }) => theme.primary1};
-  color: white;
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.1, theme.primary1)};
-  }
-  &:disabled {
-    background-color: ${({ theme, altDisabledStyle, disabled }) =>
-      altDisabledStyle ? (disabled ? theme.primary1 : theme.bg2) : theme.bg2};
-    color: ${({ theme }) => theme.text2};
-    cursor: auto;
-    box-shadow: none;
-    border: 1px solid transparent;
-    outline: none;
-  }
-`
+export type ButtonColor = 'blue' | 'pink' | 'gradient' | 'gray' | 'default' | 'red' | 'green'
 
-export const ButtonLight = styled(Base)`
-  background-color: ${({ theme }) => theme.primary5};
-  color: ${({ theme }) => theme.primaryText1};
-  font-size: 16px;
-  font-weight: 500;
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && darken(0.03, theme.primary5)};
-    background-color: ${({ theme, disabled }) => !disabled && darken(0.03, theme.primary5)};
-  }
-  &:hover {
-    background-color: ${({ theme, disabled }) => !disabled && darken(0.03, theme.primary5)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && darken(0.05, theme.primary5)};
-    background-color: ${({ theme, disabled }) => !disabled && darken(0.05, theme.primary5)};
-  }
-  :disabled {
-    opacity: 0.4;
-    :hover {
-      cursor: auto;
-      background-color: ${({ theme }) => theme.primary5};
-      box-shadow: none;
-      border: 1px solid transparent;
-      outline: none;
-    }
-  }
-`
+export type ButtonSize = 'xs' | 'sm' | 'lg' | 'default' | 'none'
 
-export const ButtonGray = styled(Base)`
-  background-color: ${({ theme }) => theme.bg1};
-  color: ${({ theme }) => theme.text2};
-  font-size: 16px;
-  font-weight: 500;
+export type ButtonVariant = 'outlined' | 'filled' | 'empty' | 'link'
 
-  &:hover {
-    background-color: ${({ theme, disabled }) => !disabled && darken(0.05, theme.bg2)};
-  }
-  &:active {
-    background-color: ${({ theme, disabled }) => !disabled && darken(0.1, theme.bg2)};
-  }
-`
+export type ButtonProps = {
+  color?: ButtonColor
+  size?: ButtonSize
+  variant?: ButtonVariant
+} & {
+  ref?: React.Ref<HTMLButtonElement>
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
 
-export const ButtonSecondary = styled(Base)`
-  border: 1px solid ${({ theme }) => theme.primary4};
-  color: ${({ theme }) => theme.primary1};
-  background-color: transparent;
-  font-size: 16px;
-  border-radius: 12px;
-  padding: ${({ padding }) => (padding ? padding : '10px')};
+function Button({
+  children,
+  className = undefined,
+  color = 'default',
+  size = 'default',
+  variant = 'filled',
+  ...rest
+}: ButtonProps): JSX.Element {
+  return (
+    <button
+      className={classNames(
+        VARIANT[variant][color],
+        variant !== 'empty' && SIZE[size],
+        'rounded font-medium disabled:cursor-not-allowed focus:outline-none',
+        // 'rounded focus:outline-none focus:ring disabled:opacity-50 disabled:cursor-not-allowed font-medium',
+        className
+      )}
+      {...rest}
+    >
+      {children}
+    </button>
+  )
+}
 
-  &:focus {
-    border: 1px solid ${({ theme }) => theme.pink2};
-  }
-  &:hover {
-    border: 1px solid ${({ theme }) => theme.pink2};
-  }
-  &:active {
-    border: 1px solid ${({ theme }) => theme.pink2};
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-  a:hover {
-    text-decoration: none;
-  }
-`
-
-export const ButtonOutlined = styled(Base)`
-  border: 1px solid ${({ theme }) => theme.bg2};
-  background-color: transparent;
-  color: ${({ theme }) => theme.text1};
-  &:focus {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:hover {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:active {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-export const ButtonYellow = styled(Base)`
-  background-color: ${({ theme }) => theme.yellow3};
-  color: white;
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.yellow3)};
-    background-color: ${({ theme }) => darken(0.05, theme.yellow3)};
-  }
-  &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.yellow3)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.yellow3)};
-    background-color: ${({ theme }) => darken(0.1, theme.yellow3)};
-  }
-  &:disabled {
-    background-color: ${({ theme }) => theme.yellow3};
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-export const ButtonEmpty = styled(Base)`
-  background-color: transparent;
-  color: ${({ theme }) => theme.primary1};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:focus {
-    text-decoration: underline;
-  }
-  &:hover {
-    text-decoration: none;
-  }
-  &:active {
-    text-decoration: none;
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-export const ButtonText = styled(Base)`
-  padding: 0;
-  width: fit-content;
-  background: none;
-  text-decoration: none;
-  &:focus {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    text-decoration: underline;
-  }
-  &:hover {
-    // text-decoration: underline;
-    opacity: 0.9;
-  }
-  &:active {
-    text-decoration: underline;
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-const ButtonConfirmedStyle = styled(Base)`
-  background-color: ${({ theme }) => theme.bg3};
-  color: ${({ theme }) => theme.text1};
-  /* border: 1px solid ${({ theme }) => theme.green1}; */
-
-  &:disabled {
-    /* opacity: 50%; */
-    background-color: ${({ theme }) => theme.bg2};
-    color: ${({ theme }) => theme.text2};
-    cursor: auto;
-  }
-`
-
-const ButtonErrorStyle = styled(Base)`
-  background-color: ${({ theme }) => theme.red1};
-  border: 1px solid ${({ theme }) => theme.red1};
-
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.red1)};
-    background-color: ${({ theme }) => darken(0.05, theme.red1)};
-  }
-  &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.red1)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.red1)};
-    background-color: ${({ theme }) => darken(0.1, theme.red1)};
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-    box-shadow: none;
-    background-color: ${({ theme }) => theme.red1};
-    border: 1px solid ${({ theme }) => theme.red1};
-  }
-`
+export default Button
 
 export function ButtonConfirmed({
   confirmed,
-  altDisabledStyle,
+  disabled,
   ...rest
-}: { confirmed?: boolean; altDisabledStyle?: boolean } & ButtonProps) {
+}: { confirmed?: boolean; disabled?: boolean } & ButtonProps) {
   if (confirmed) {
-    return <ButtonConfirmedStyle {...rest} />
+    return (
+      <Button
+        variant="outlined"
+        color="green"
+        size="lg"
+        className={classNames(disabled && 'cursor-not-allowed', 'border opacity-50')}
+        disabled={disabled}
+        {...rest}
+      />
+    )
   } else {
-    return <ButtonPrimary {...rest} altDisabledStyle={altDisabledStyle} />
+    return <Button color={disabled ? 'gray' : 'gradient'} size="lg" disabled={disabled} {...rest} />
   }
 }
 
-export function ButtonError({ error, ...rest }: { error?: boolean } & ButtonProps) {
+export function ButtonError({
+  error,
+  disabled,
+  ...rest
+}: {
+  error?: boolean
+  disabled?: boolean
+} & ButtonProps) {
   if (error) {
-    return <ButtonErrorStyle {...rest} />
+    return <Button color="red" size="lg" {...rest} />
   } else {
-    return <ButtonPrimary {...rest} />
-  }
-}
-
-export function ButtonDropdown({ disabled = false, children, ...rest }: { disabled?: boolean } & ButtonProps) {
-  return (
-    <ButtonPrimary {...rest} disabled={disabled}>
-      <RowBetween>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        <ChevronDown size={24} />
-      </RowBetween>
-    </ButtonPrimary>
-  )
-}
-
-export function ButtonDropdownLight({ disabled = false, children, ...rest }: { disabled?: boolean } & ButtonProps) {
-  return (
-    <ButtonOutlined {...rest} disabled={disabled}>
-      <RowBetween>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        <ChevronDown size={24} />
-      </RowBetween>
-    </ButtonOutlined>
-  )
-}
-
-const ActiveOutlined = styled(ButtonOutlined)`
-  border: 1px solid;
-  border-color: ${({ theme }) => theme.primary1};
-`
-
-const Circle = styled.div`
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  background-color: ${({ theme }) => theme.primary1};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const CheckboxWrapper = styled.div`
-  width: 30px;
-  padding: 0 10px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-`
-
-const ResponsiveCheck = styled(Check)`
-  size: 13px;
-`
-
-export function ButtonRadioChecked({ active = false, children, ...rest }: { active?: boolean } & ButtonProps) {
-  const theme = useTheme()
-
-  if (!active) {
-    return (
-      <ButtonOutlined $borderRadius="12px" padding="12px 8px" {...rest}>
-        {<RowBetween>{children}</RowBetween>}
-      </ButtonOutlined>
-    )
-  } else {
-    return (
-      <ActiveOutlined {...rest} padding="12px 8px" $borderRadius="12px">
-        {
-          <RowBetween>
-            {children}
-            <CheckboxWrapper>
-              <Circle>
-                <ResponsiveCheck size={13} stroke={theme.white} />
-              </Circle>
-            </CheckboxWrapper>
-          </RowBetween>
-        }
-      </ActiveOutlined>
-    )
+    return <Button color={disabled ? 'gray' : 'gradient'} disabled={disabled} size="lg" {...rest} />
   }
 }

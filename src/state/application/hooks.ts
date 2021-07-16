@@ -1,36 +1,58 @@
 import { useCallback, useMemo } from 'react'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { AppState } from '../index'
+import { useDispatch, useSelector } from 'react-redux'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal } from './actions'
 
 export function useBlockNumber(): number | undefined {
   const { chainId } = useActiveWeb3React()
 
-  return useAppSelector((state: AppState) => state.application.blockNumber[chainId ?? -1])
+  return useSelector((state: AppState) => state.application.blockNumber[chainId ?? -1])
 }
 
 export function useModalOpen(modal: ApplicationModal): boolean {
-  const openModal = useAppSelector((state: AppState) => state.application.openModal)
+  const openModal = useSelector((state: AppState) => state.application.openModal)
   return openModal === modal
 }
 
 export function useToggleModal(modal: ApplicationModal): () => void {
   const open = useModalOpen(modal)
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   return useCallback(() => dispatch(setOpenModal(open ? null : modal)), [dispatch, modal, open])
+}
+
+export function useOpenModal(modal: ApplicationModal): () => void {
+  const dispatch = useDispatch<AppDispatch>()
+  return useCallback(() => dispatch(setOpenModal(modal)), [dispatch, modal])
+}
+
+export function useCloseModals(): () => void {
+  const dispatch = useDispatch<AppDispatch>()
+  return useCallback(() => dispatch(setOpenModal(null)), [dispatch])
 }
 
 export function useWalletModalToggle(): () => void {
   return useToggleModal(ApplicationModal.WALLET)
 }
 
+export function useNetworkModalToggle(): () => void {
+  return useToggleModal(ApplicationModal.NETWORK)
+}
+
 export function useToggleSettingsMenu(): () => void {
   return useToggleModal(ApplicationModal.SETTINGS)
 }
 
+export function useShowClaimPopup(): boolean {
+  return useModalOpen(ApplicationModal.CLAIM_POPUP)
+}
+
 export function useToggleShowClaimPopup(): () => void {
   return useToggleModal(ApplicationModal.CLAIM_POPUP)
+}
+
+export function useToggleSelfClaimModal(): () => void {
+  return useToggleModal(ApplicationModal.SELF_CLAIM)
 }
 
 export function useToggleDelegateModal(): () => void {
@@ -43,7 +65,7 @@ export function useToggleVoteModal(): () => void {
 
 // returns a function that allows adding a popup
 export function useAddPopup(): (content: PopupContent, key?: string) => void {
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch()
 
   return useCallback(
     (content: PopupContent, key?: string) => {
@@ -55,7 +77,7 @@ export function useAddPopup(): (content: PopupContent, key?: string) => void {
 
 // returns a function that allows removing a popup via its key
 export function useRemovePopup(): (key: string) => void {
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch()
   return useCallback(
     (key: string) => {
       dispatch(removePopup({ key }))
@@ -66,6 +88,10 @@ export function useRemovePopup(): (key: string) => void {
 
 // get the list of active popups
 export function useActivePopups(): AppState['application']['popupList'] {
-  const list = useAppSelector((state: AppState) => state.application.popupList)
+  const list = useSelector((state: AppState) => state.application.popupList)
   return useMemo(() => list.filter((item) => item.show), [list])
+}
+
+export function useKashiApprovalPending(): string {
+  return useSelector((state: AppState) => state.application.kashiApprovalPending)
 }

@@ -1,47 +1,42 @@
-import styled from 'styled-components/macro'
-import { Box } from 'rebass/styled-components'
+import React from 'react'
 
-const Card = styled(Box)<{ width?: string; padding?: string; border?: string; $borderRadius?: string }>`
-  width: ${({ width }) => width ?? '100%'};
-  padding: ${({ padding }) => padding ?? '1rem'};
-  border-radius: ${({ $borderRadius }) => $borderRadius ?? '16px'};
-  border: ${({ border }) => border};
-`
-export default Card
+type CardProps = {
+  header?: React.ReactChild
+  footer?: React.ReactChild
+  backgroundImage?: string
+  title?: string
+  description?: string
+} & React.HTMLAttributes<HTMLDivElement>
 
-export const LightCard = styled(Card)`
-  border: 1px solid ${({ theme }) => theme.bg2};
-  background-color: ${({ theme }) => theme.bg1};
-`
+export default function Card({
+  header = undefined,
+  footer = undefined,
+  backgroundImage = '',
+  title = '',
+  description = '',
+  children,
+  className,
+}: CardProps) {
+  return (
+    <div
+      className={`relative ${className}`}
+      style={{
+        borderRadius: '10px',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center bottom',
+      }}
+    >
+      {header && <>{header}</>}
 
-export const LightGreyCard = styled(Card)`
-  background-color: ${({ theme }) => theme.bg2};
-`
+      <div className="px-2 py-4 sm:p-8">
+        {title && <div className="mb-4 text-2xl text-high-emphesis">{title}</div>}
+        {description && <div className="text-base text-secondary">{description}</div>}
+        {children}
+      </div>
 
-export const GreyCard = styled(Card)`
-  background-color: ${({ theme }) => theme.bg3};
-`
-
-export const DarkGreyCard = styled(Card)`
-  background-color: ${({ theme }) => theme.bg2};
-`
-
-export const DarkCard = styled(Card)`
-  background-color: ${({ theme }) => theme.bg0};
-`
-
-export const OutlineCard = styled(Card)`
-  border: 1px solid ${({ theme }) => theme.bg3};
-`
-
-export const YellowCard = styled(Card)`
-  background-color: rgba(243, 132, 30, 0.05);
-  color: ${({ theme }) => theme.yellow3};
-  font-weight: 500;
-`
-
-export const BlueCard = styled(Card)`
-  background-color: ${({ theme }) => theme.primary5};
-  color: ${({ theme }) => theme.blue2};
-  border-radius: 12px;
-`
+      {footer && <>{footer}</>}
+    </div>
+  )
+}

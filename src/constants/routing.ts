@@ -1,29 +1,62 @@
-// a list of tokens by chain
-import { Currency, Token } from '@uniswap/sdk-core'
-import { SupportedChainId } from './chains'
 import {
+  ALPHA,
   AMPL,
+  AVALANCHE,
+  BAB,
+  BAC,
+  BSC,
+  CELO,
+  CREAM,
+  CRV,
+  CVXCRV,
   DAI,
-  ExtendedEther,
+  DOUGH,
+  DUCK,
+  ETH2X_FLI,
+  FANTOM,
   FEI,
   FRAX,
   FXS,
+  HARMONY,
+  HBTC,
+  HECO,
+  IBETH,
+  LFBTC,
+  LIFT,
+  MATIC,
   MIR,
-  renBTC,
+  NFTX,
+  OKEX,
+  PLAY,
+  PONT,
+  PWING,
+  RENBTC,
+  RUNE,
+  STETH,
+  SUSHI,
   TRIBE,
   UMA,
-  UNI,
   USDC,
+  USDP,
   USDT,
   UST,
   WBTC,
-  ETH2X_FLI,
-  WETH9_EXTENDED,
+  XDAI,
+  XSUSHI,
 } from './tokens'
+// a list of tokens by chain
+import { ChainId, Currency, Token, WNATIVE } from '@sushiswap/sdk'
+
+import { SupportedChainId } from './chains'
 
 type ChainTokenList = {
   readonly [chainId: number]: Token[]
 }
+
+// // a list of tokens by chain
+// type ChainTokenList = {
+//     readonly [chainId in ChainId]: Token[]
+// }
 
 type ChainCurrencyList = {
   readonly [chainId: number]: Currency[]
@@ -32,7 +65,7 @@ type ChainCurrencyList = {
 // List of all mirror's assets addresses.
 // Last pulled from : https://whitelist.mirror.finance/eth/tokenlists.json
 // TODO: Generate this programmatically ?
-const mAssetsAdditionalBases: { [tokenAddress: string]: Token[] } = {
+const MIRROR_ADDITIONAL_BASES: { [tokenAddress: string]: Token[] } = {
   [UST.address]: [MIR],
   [MIR.address]: [UST],
   '0xd36932143F6eBDEDD872D5Fb0651f4B72Fd15a84': [MIR, UST], // mAAPL
@@ -49,63 +82,224 @@ const mAssetsAdditionalBases: { [tokenAddress: string]: Token[] } = {
   '0x31c63146a635EB7465e5853020b39713AC356991': [MIR, UST], // mUSO
   '0xf72FCd9DCF0190923Fadd44811E240Ef4533fc86': [MIR, UST], // mVIXY
 }
-const WETH_ONLY: ChainTokenList = {
-  [SupportedChainId.ETHER_MAINNET]: [WETH9_EXTENDED[SupportedChainId.ETHER_MAINNET]],
-  [SupportedChainId.KOVAN]: [WETH9_EXTENDED[SupportedChainId.KOVAN]],
+
+// TODO: SDK should have two maps, WETH map and WNATIVE map.
+const WRAPPED_NATIVE_ONLY: ChainTokenList = {
+  [ChainId.MAINNET]: [WNATIVE[ChainId.MAINNET]],
+  [ChainId.ROPSTEN]: [WNATIVE[ChainId.ROPSTEN]],
+  [ChainId.RINKEBY]: [WNATIVE[ChainId.RINKEBY]],
+  [ChainId.GÖRLI]: [WNATIVE[ChainId.GÖRLI]],
+  [ChainId.KOVAN]: [WNATIVE[ChainId.KOVAN]],
+  [ChainId.FANTOM]: [WNATIVE[ChainId.FANTOM]],
+  [ChainId.FANTOM_TESTNET]: [WNATIVE[ChainId.FANTOM_TESTNET]],
+  [ChainId.MATIC]: [WNATIVE[ChainId.MATIC]],
+  [ChainId.MATIC_TESTNET]: [WNATIVE[ChainId.MATIC_TESTNET]],
+  [ChainId.XDAI]: [WNATIVE[ChainId.XDAI]],
+  [ChainId.BSC]: [WNATIVE[ChainId.BSC]],
+  [ChainId.BSC_TESTNET]: [WNATIVE[ChainId.BSC_TESTNET]],
+  [ChainId.ARBITRUM]: [WNATIVE[ChainId.ARBITRUM]],
+  [ChainId.ARBITRUM_TESTNET]: [WNATIVE[ChainId.ARBITRUM_TESTNET]],
+  [ChainId.MOONBEAM_TESTNET]: [WNATIVE[ChainId.MOONBEAM_TESTNET]],
+  [ChainId.AVALANCHE]: [WNATIVE[ChainId.AVALANCHE]],
+  [ChainId.AVALANCHE_TESTNET]: [WNATIVE[ChainId.AVALANCHE_TESTNET]],
+  [ChainId.HECO]: [WNATIVE[ChainId.HECO]],
+  [ChainId.HECO_TESTNET]: [WNATIVE[ChainId.HECO_TESTNET]],
+  [ChainId.HARMONY]: [WNATIVE[ChainId.HARMONY]],
+  [ChainId.HARMONY_TESTNET]: [WNATIVE[ChainId.HARMONY_TESTNET]],
+  [ChainId.OKEX]: [WNATIVE[ChainId.OKEX]],
+  [ChainId.OKEX_TESTNET]: [WNATIVE[ChainId.OKEX_TESTNET]],
+  [ChainId.CELO]: [WNATIVE[ChainId.CELO]],
 }
+
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  ...WETH_ONLY,
-  [1]: [...WETH_ONLY[1], DAI, USDC, USDT, WBTC],
+  ...WRAPPED_NATIVE_ONLY,
+  [ChainId.MAINNET]: [...WRAPPED_NATIVE_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC, RUNE, NFTX, STETH],
+  [ChainId.MATIC]: [...WRAPPED_NATIVE_ONLY[ChainId.MATIC], MATIC.USDC, MATIC.WBTC, MATIC.DAI, MATIC.WETH, MATIC.USDT],
+  [ChainId.FANTOM]: [...WRAPPED_NATIVE_ONLY[ChainId.FANTOM], FANTOM.DAI, FANTOM.USDC, FANTOM.WBTC, FANTOM.WETH],
+  [ChainId.BSC]: [...WRAPPED_NATIVE_ONLY[ChainId.BSC], BSC.DAI, BSC.USD, BSC.USDC, BSC.USDT, BSC.BTCB, BSC.WETH],
+  [ChainId.ARBITRUM]: [...WRAPPED_NATIVE_ONLY[ChainId.ARBITRUM]],
+  [ChainId.XDAI]: [...WRAPPED_NATIVE_ONLY[ChainId.XDAI], XDAI.USDC, XDAI.USDT, XDAI.WBTC, XDAI.WETH],
+  [ChainId.AVALANCHE]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.AVALANCHE],
+    AVALANCHE.DAI,
+    AVALANCHE.USDT,
+    AVALANCHE.WBTC,
+    AVALANCHE.WETH,
+  ],
+  [ChainId.HARMONY]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.HARMONY],
+    HARMONY.DAI,
+    HARMONY.USDC,
+    HARMONY.USDT,
+    HARMONY.WBTC,
+    HARMONY.WETH,
+  ],
+  [ChainId.HECO]: [...WRAPPED_NATIVE_ONLY[ChainId.HECO], HECO.DAI, HECO.USDC, HECO.USDT, HECO.WBTC, HECO.WETH],
+  [ChainId.OKEX]: [...WRAPPED_NATIVE_ONLY[ChainId.OKEX], OKEX.DAI, OKEX.USDC, OKEX.USDT, OKEX.WBTC, OKEX.WETH],
+  [ChainId.CELO]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.CELO],
+    CELO.mCUSD,
+    CELO.mCELO,
+    CELO.mcEURO,
+    CELO.cUSD,
+    CELO.cEURO,
+    CELO.cBTC,
+  ],
 }
-export const ADDITIONAL_BASES: { [chainId: number]: { [tokenAddress: string]: Token[] } } = {
-  [1]: {
-    ...mAssetsAdditionalBases,
+
+export const ADDITIONAL_BASES: {
+  [chainId: number]: { [tokenAddress: string]: Token[] }
+} = {
+  [ChainId.MAINNET]: {
+    ...MIRROR_ADDITIONAL_BASES,
     '0xF16E4d813f4DcfDe4c5b44f305c908742De84eF0': [ETH2X_FLI],
-    '0xA948E86885e12Fb09AfEF8C52142EBDbDf73cD18': [UNI[1]],
-    '0x561a4717537ff4AF5c687328c0f7E90a319705C0': [UNI[1]],
-    '0xE0360A9e2cdd7d03B9408c7D3001E017BAc2EcD5': [UNI[1]],
-    '0xa6e3454fec677772dd771788a079355e43910638': [UMA],
-    '0xB46F57e7Ce3a284d74b70447Ef9352B5E5Df8963': [UMA],
+    '0xe379a60A8FC7C9DD161887fFADF3054790576c8D': [XSUSHI], // XSUSHI 25 Call [30 June 2021]
+    '0xB46F57e7Ce3a284d74b70447Ef9352B5E5Df8963': [UMA], // UMA 25 Call [30 June 2021]
     [FEI.address]: [TRIBE],
     [TRIBE.address]: [FEI],
     [FRAX.address]: [FXS],
     [FXS.address]: [FRAX],
-    [WBTC.address]: [renBTC],
-    [renBTC.address]: [WBTC],
+    [WBTC.address]: [RENBTC],
+    [RENBTC.address]: [WBTC],
+    [PONT.address]: [PWING],
+    [PWING.address]: [PONT],
+    [PLAY.address]: [DOUGH],
+    [DOUGH.address]: [PLAY],
+    [IBETH.address]: [ALPHA],
+    [ALPHA.address]: [IBETH],
+    [HBTC.address]: [CREAM],
+    [CREAM.address]: [HBTC],
+    [DUCK.address]: [USDP],
+    [USDP.address]: [DUCK],
+    [BAB.address]: [BAC],
+    [BAC.address]: [BAB],
+    [LIFT.address]: [LFBTC],
+    [LFBTC.address]: [LIFT],
+    [CVXCRV.address]: [CRV],
+    [CRV.address]: [CVXCRV],
+  },
+  [ChainId.MATIC]: {
+    [MATIC.FRAX.address]: [MATIC.FXS],
+    [MATIC.FXS.address]: [MATIC.FRAX],
+    [MATIC.DRAX.address]: [MATIC.DMAGIC],
+    [MATIC.DMAGIC.address]: [MATIC.DRAX],
   },
 }
+
 /**
  * Some tokens can only be swapped via certain pairs, so we override the list of bases that are considered for these
  * tokens.
  */
-export const CUSTOM_BASES: { [chainId: number]: { [tokenAddress: string]: Token[] } } = {
-  [1]: {
-    [AMPL.address]: [DAI, WETH9_EXTENDED[1]],
+export const CUSTOM_BASES: {
+  [chainId: number]: { [tokenAddress: string]: Token[] }
+} = {
+  [ChainId.MAINNET]: {
+    [AMPL.address]: [DAI, WNATIVE[ChainId.MAINNET]],
+  },
+  [ChainId.MATIC]: {
+    [MATIC.TEL.address]: [MATIC.SUSHI, MATIC.AAVE],
   },
 }
 
 /**
  * Shows up in the currency select for swap and add liquidity
  */
-export const COMMON_BASES: ChainCurrencyList = {
-  [1]: [ExtendedEther.onChain(1), DAI, USDC, USDT, WBTC, WETH9_EXTENDED[1]],
-  [3]: [ExtendedEther.onChain(3), WETH9_EXTENDED[3]],
-  [4]: [ExtendedEther.onChain(4), WETH9_EXTENDED[4]],
-  [5]: [ExtendedEther.onChain(5), WETH9_EXTENDED[5]],
-  [42]: [ExtendedEther.onChain(42), WETH9_EXTENDED[42]],
+// export const COMMON_BASES: ChainCurrencyList = {
+//     [ChainId.MAINNET]: [ExtendedEther.onChain(1), DAI, USDC, USDT, WBTC, WETH9_EXTENDED[1]],
+//     [3]: [ExtendedEther.onChain(3), WETH9_EXTENDED[3]],
+//     [4]: [ExtendedEther.onChain(4), WETH9_EXTENDED[4]],
+//     [5]: [ExtendedEther.onChain(5), WETH9_EXTENDED[5]],
+//     [42]: [ExtendedEther.onChain(42), WETH9_EXTENDED[42]],
+//     [SupportedChainId.ARBITRUM_KOVAN]: [
+//         ExtendedEther.onChain(SupportedChainId.ARBITRUM_KOVAN),
+//         WETH9_EXTENDED[SupportedChainId.ARBITRUM_KOVAN],
+//     ],
+//     [SupportedChainId.ARBITRUM_ONE]: [
+//         ExtendedEther.onChain(SupportedChainId.ARBITRUM_ONE),
+//         WETH9_EXTENDED[SupportedChainId.ARBITRUM_ONE],
+//     ],
+// }
+
+/**
+ * Shows up in the currency select for swap and add liquidity
+ */
+export const COMMON_BASES: ChainTokenList = {
+  [ChainId.MAINNET]: [...WRAPPED_NATIVE_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC],
+  [ChainId.MATIC]: [...WRAPPED_NATIVE_ONLY[ChainId.MATIC], MATIC.USDC, MATIC.WBTC, MATIC.DAI, MATIC.WETH, MATIC.USDT],
+  [ChainId.FANTOM]: [...WRAPPED_NATIVE_ONLY[ChainId.FANTOM], FANTOM.DAI, FANTOM.USDC, FANTOM.WBTC, FANTOM.WETH],
+  [ChainId.BSC]: [...WRAPPED_NATIVE_ONLY[ChainId.BSC], BSC.DAI, BSC.USD, BSC.USDC, BSC.USDT, BSC.BTCB, BSC.WETH],
+  [ChainId.ARBITRUM]: [...WRAPPED_NATIVE_ONLY[ChainId.ARBITRUM]],
+  [ChainId.XDAI]: [...WRAPPED_NATIVE_ONLY[ChainId.XDAI], XDAI.USDC, XDAI.USDT, XDAI.WBTC, XDAI.WETH],
+  [ChainId.AVALANCHE]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.AVALANCHE],
+    AVALANCHE.DAI,
+    AVALANCHE.USDT,
+    AVALANCHE.WBTC,
+    AVALANCHE.WETH,
+  ],
+  [ChainId.HARMONY]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.HARMONY],
+    HARMONY.DAI,
+    HARMONY.USDC,
+    HARMONY.USDT,
+    HARMONY.WETH,
+    HARMONY.WBTC,
+  ],
+  [ChainId.HECO]: [...WRAPPED_NATIVE_ONLY[ChainId.HECO], HECO.DAI, HECO.USDC, HECO.USDT, HECO.WBTC, HECO.WETH],
+  [ChainId.OKEX]: [...WRAPPED_NATIVE_ONLY[ChainId.OKEX], OKEX.DAI, OKEX.USDC, OKEX.USDT, OKEX.WBTC, OKEX.WETH],
+  // [ChainId.CELO]: [
+  //   ...WRAPPED_NATIVE_ONLY[ChainId.CELO],
+  //   CELO.mCUSD,
+  //   CELO.mCELO,
+  //   CELO.mcEURO,
+  //   CELO.cEUR,
+  // ],
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
-  ...WETH_ONLY,
-  [1]: [...WETH_ONLY[1], DAI, USDC, USDT, WBTC],
+  ...WRAPPED_NATIVE_ONLY,
+  [ChainId.MAINNET]: [...WRAPPED_NATIVE_ONLY[ChainId.MAINNET], DAI, USDC, USDT, WBTC],
+  [ChainId.MATIC]: [...WRAPPED_NATIVE_ONLY[ChainId.MATIC], MATIC.USDC, MATIC.WBTC, MATIC.DAI, MATIC.WETH, MATIC.USDT],
+  [ChainId.FANTOM]: [...WRAPPED_NATIVE_ONLY[ChainId.FANTOM], FANTOM.DAI, FANTOM.USDC, FANTOM.WBTC, FANTOM.WETH],
+  [ChainId.BSC]: [...WRAPPED_NATIVE_ONLY[ChainId.BSC], BSC.DAI, BSC.USD, BSC.USDC, BSC.USDT, BSC.BTCB, BSC.WETH],
+  [ChainId.ARBITRUM]: [...WRAPPED_NATIVE_ONLY[ChainId.ARBITRUM]],
+  [ChainId.XDAI]: [...WRAPPED_NATIVE_ONLY[ChainId.XDAI], XDAI.USDC, XDAI.USDT, XDAI.WBTC, XDAI.WETH],
+  [ChainId.AVALANCHE]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.AVALANCHE],
+    AVALANCHE.DAI,
+    AVALANCHE.USDT,
+    AVALANCHE.WBTC,
+    AVALANCHE.WETH,
+  ],
+  [ChainId.HARMONY]: [
+    ...WRAPPED_NATIVE_ONLY[ChainId.HARMONY],
+    HARMONY.DAI,
+    HARMONY.USDC,
+    HARMONY.USDT,
+    HARMONY.WBTC,
+    HARMONY.WETH,
+  ],
+  [ChainId.HECO]: [...WRAPPED_NATIVE_ONLY[ChainId.HECO], HECO.DAI, HECO.USDC, HECO.USDT, HECO.WBTC, HECO.WETH],
+  [ChainId.OKEX]: [...WRAPPED_NATIVE_ONLY[ChainId.OKEX], OKEX.DAI, OKEX.USDC, OKEX.USDT, OKEX.WBTC, OKEX.WETH],
+  // [ChainId.CELO]: [
+  //   ...WRAPPED_NATIVE_ONLY[ChainId.CELO],
+  //   CELO.mCUSD,
+  //   CELO.mCELO,
+  //   CELO.mcEURO,
+  //   CELO.cEUR,
+  // ],
 }
-export const PINNED_PAIRS: { readonly [chainId: number]: [Token, Token][] } = {
-  [1]: [
+
+export const PINNED_PAIRS: {
+  readonly [chainId in ChainId]?: [Token, Token][]
+} = {
+  [ChainId.MAINNET]: [
+    [SUSHI[ChainId.MAINNET] as Token, WNATIVE[ChainId.MAINNET]],
     [
-      new Token(1, '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643', 8, 'cDAI', 'Compound Dai'),
-      new Token(1, '0x39AA39c021dfbaE8faC545936693aC917d5E7563', 8, 'cUSDC', 'Compound USD Coin'),
+      new Token(ChainId.MAINNET, '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643', 8, 'cDAI', 'Compound Dai'),
+      new Token(ChainId.MAINNET, '0x39AA39c021dfbaE8faC545936693aC917d5E7563', 8, 'cUSDC', 'Compound USD Coin'),
     ],
     [USDC, USDT],
     [DAI, USDT],

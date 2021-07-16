@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo } from 'react'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { SupportedChainId } from '../../constants/chains'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { retry, RetryableError, RetryOptions } from '../../utils/retry'
-import { updateBlockNumber } from '../application/actions'
-import { useAddPopup, useBlockNumber } from '../application/hooks'
+import { AppDispatch, AppState } from '../index'
+import { RetryOptions, RetryableError, retry } from '../../functions/retry'
 import { checkedTransaction, finalizeTransaction } from './actions'
+import { useAddPopup, useBlockNumber } from '../application/hooks'
+import { useAppDispatch, useAppSelector } from '../hooks'
+import { useCallback, useEffect, useMemo } from 'react'
+
+import { ChainId } from '@sushiswap/sdk'
+import { updateBlockNumber } from '../application/actions'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
 
 interface TxInterface {
   addedTime: number
@@ -31,8 +33,11 @@ export function shouldCheck(lastBlockNumber: number, tx: TxInterface): boolean {
   }
 }
 
-const RETRY_OPTIONS_BY_CHAIN_ID: { [chainId: number]: RetryOptions } = {}
-const DEFAULT_RETRY_OPTIONS: RetryOptions = { n: 1, minWait: 0, maxWait: 0 }
+const RETRY_OPTIONS_BY_CHAIN_ID: { [chainId: number]: RetryOptions } = {
+  [ChainId.HARMONY]: { n: 10, minWait: 250, maxWait: 1000 },
+  [ChainId.ARBITRUM]: { n: 10, minWait: 250, maxWait: 1000 },
+}
+const DEFAULT_RETRY_OPTIONS: RetryOptions = { n: 3, minWait: 1000, maxWait: 3000 }
 
 export default function Updater(): null {
   const { chainId, library } = useActiveWeb3React()

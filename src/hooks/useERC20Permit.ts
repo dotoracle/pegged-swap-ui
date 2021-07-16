@@ -1,15 +1,12 @@
-import JSBI from 'jsbi'
-import { Percent, CurrencyAmount, Currency, TradeType, Token } from '@uniswap/sdk-core'
-import { Trade as V2Trade } from '@uniswap/v2-sdk'
-import { Trade as V3Trade } from '@uniswap/v3-sdk'
-import { splitSignature } from 'ethers/lib/utils'
+import { Currency, CurrencyAmount, JSBI, Percent, Token, TradeType, Trade as V2Trade } from '@sushiswap/sdk'
+import { DAI, SUSHI, USDC } from '../constants/tokens'
 import { useMemo, useState } from 'react'
-import { SWAP_ROUTER_ADDRESSES } from '../constants/addresses'
-import { DAI, UNI, USDC } from '../constants/tokens'
-import { useSingleCallResult } from '../state/multicall/hooks'
-import { useActiveWeb3React } from './web3'
+
+import { splitSignature } from 'ethers/lib/utils'
+import { useActiveWeb3React } from './useActiveWeb3React'
 import { useEIP2612Contract } from './useContract'
 import useIsArgentWallet from './useIsArgentWallet'
+import { useSingleCallResult } from '../state/multicall/hooks'
 import useTransactionDeadline from './useTransactionDeadline'
 
 enum PermitType {
@@ -35,11 +32,34 @@ const PERMITTABLE_TOKENS: {
 } = {
   [1]: {
     [USDC.address]: { type: PermitType.AMOUNT, name: 'USD Coin', version: '2' },
-    [DAI.address]: { type: PermitType.ALLOWED, name: 'Dai Stablecoin', version: '1' },
-    [UNI[1].address]: { type: PermitType.AMOUNT, name: 'Uniswap' },
+    [DAI.address]: {
+      type: PermitType.ALLOWED,
+      name: 'Dai Stablecoin',
+      version: '1',
+    },
+    [SUSHI[1].address]: { type: PermitType.AMOUNT, name: 'SushiSwap' },
+  },
+  [4]: {
+    ['0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735']: {
+      type: PermitType.ALLOWED,
+      name: 'Dai Stablecoin',
+      version: '1',
+    },
+    [SUSHI[4].address]: { type: PermitType.AMOUNT, name: 'SushiSwap' },
+  },
+  [3]: {
+    [SUSHI[3].address]: { type: PermitType.AMOUNT, name: 'SushiSwap' },
+    ['0x07865c6E87B9F70255377e024ace6630C1Eaa37F']: {
+      type: PermitType.AMOUNT,
+      name: 'USD Coin',
+      version: '2',
+    },
+  },
+  [5]: {
+    [SUSHI[5].address]: { type: PermitType.AMOUNT, name: 'SushiSwap' },
   },
   [42]: {
-    [UNI[42].address]: { type: PermitType.AMOUNT, name: 'Uniswap' },
+    [SUSHI[42].address]: { type: PermitType.AMOUNT, name: 'SushiSwap' },
   },
 }
 
@@ -64,11 +84,11 @@ interface BaseSignatureData {
   permitType: PermitType
 }
 
-interface StandardSignatureData extends BaseSignatureData {
+export interface StandardSignatureData extends BaseSignatureData {
   amount: string
 }
 
-interface AllowedSignatureData extends BaseSignatureData {
+export interface AllowedSignatureData extends BaseSignatureData {
   allowed: true
 }
 
@@ -103,7 +123,7 @@ const PERMIT_ALLOWED_TYPE = [
   { name: 'allowed', type: 'bool' },
 ]
 
-function useERC20Permit(
+export function useERC20Permit(
   currencyAmount: CurrencyAmount<Currency> | null | undefined,
   spender: string | null | undefined,
   overridePermitInfo: PermitInfo | undefined | null
@@ -248,7 +268,7 @@ function useERC20Permit(
 
 const REMOVE_V2_LIQUIDITY_PERMIT_INFO: PermitInfo = {
   version: '1',
-  name: 'Uniswap V2',
+  name: 'SushiSwap LP Token',
   type: PermitType.AMOUNT,
 }
 
@@ -260,11 +280,11 @@ export function useV2LiquidityTokenPermit(
 }
 
 export function useERC20PermitFromTrade(
-  trade: V2Trade<Currency, Currency, TradeType> | V3Trade<Currency, Currency, TradeType> | undefined,
+  trade: V2Trade<Currency, Currency, TradeType> | undefined,
   allowedSlippage: Percent
 ) {
   const { chainId } = useActiveWeb3React()
-  const swapRouterAddress = chainId ? SWAP_ROUTER_ADDRESSES[chainId] : undefined
+
   const amountToApprove = useMemo(
     () => (trade ? trade.maximumAmountIn(allowedSlippage) : undefined),
     [trade, allowedSlippage]
@@ -273,7 +293,7 @@ export function useERC20PermitFromTrade(
   return useERC20Permit(
     amountToApprove,
     // v2 router does not support
-    trade instanceof V2Trade ? undefined : trade instanceof V3Trade ? swapRouterAddress : undefined,
+    trade instanceof V2Trade ? undefined : trade,
     null
   )
 }

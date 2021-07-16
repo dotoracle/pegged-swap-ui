@@ -1,37 +1,37 @@
 import { createReducer, nanoid } from '@reduxjs/toolkit'
 import {
   addPopup,
+  ApplicationModal,
   PopupContent,
   removePopup,
-  updateBlockNumber,
-  ApplicationModal,
+  setKashiApprovalPending,
   setOpenModal,
-  updateChainId,
+  updateBlockNumber,
 } from './actions'
 
-type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
+type PopupList = Array<{
+  key: string
+  show: boolean
+  content: PopupContent
+  removeAfterMs: number | null
+}>
 
 export interface ApplicationState {
-  // used by RTK-Query to build dynamic subgraph urls
-  readonly chainId: number | null
   readonly blockNumber: { readonly [chainId: number]: number }
   readonly popupList: PopupList
   readonly openModal: ApplicationModal | null
+  kashiApprovalPending: string
 }
 
 const initialState: ApplicationState = {
-  chainId: null,
   blockNumber: {},
   popupList: [],
   openModal: null,
+  kashiApprovalPending: '',
 }
 
 export default createReducer(initialState, (builder) =>
   builder
-    .addCase(updateChainId, (state, action) => {
-      const { chainId } = action.payload
-      state.chainId = chainId
-    })
     .addCase(updateBlockNumber, (state, action) => {
       const { chainId, blockNumber } = action.payload
       if (typeof state.blockNumber[chainId] !== 'number') {
@@ -43,7 +43,7 @@ export default createReducer(initialState, (builder) =>
     .addCase(setOpenModal, (state, action) => {
       state.openModal = action.payload
     })
-    .addCase(addPopup, (state, { payload: { content, key, removeAfterMs = 25000 } }) => {
+    .addCase(addPopup, (state, { payload: { content, key, removeAfterMs = 15000 } }) => {
       state.popupList = (key ? state.popupList.filter((popup) => popup.key !== key) : state.popupList).concat([
         {
           key: key || nanoid(),
@@ -59,5 +59,8 @@ export default createReducer(initialState, (builder) =>
           p.show = false
         }
       })
+    })
+    .addCase(setKashiApprovalPending, (state, action) => {
+      state.kashiApprovalPending = action.payload
     })
 )

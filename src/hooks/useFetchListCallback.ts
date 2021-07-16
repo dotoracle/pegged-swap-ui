@@ -1,25 +1,27 @@
-import { nanoid } from '@reduxjs/toolkit'
+import { AppDispatch } from '../state'
+import { ChainId } from '@sushiswap/sdk'
 import { TokenList } from '@uniswap/token-lists'
-import { useCallback } from 'react'
-
-import { getNetworkLibrary } from '../connectors'
-import { useAppDispatch } from 'state/hooks'
 import { fetchTokenList } from '../state/lists/actions'
-import getTokenList from '../utils/getTokenList'
-import resolveENSContentHash from '../utils/resolveENSContentHash'
-import { useActiveWeb3React } from './web3'
+import { getNetworkLibrary } from '../connectors'
+import { getTokenList } from '../functions/list'
+import { nanoid } from '@reduxjs/toolkit'
+import { resolveENSContentHash } from '../functions/ens'
+import { useActiveWeb3React } from './useActiveWeb3React'
+import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 
 export function useFetchListCallback(): (listUrl: string, sendDispatch?: boolean) => Promise<TokenList> {
   const { chainId, library } = useActiveWeb3React()
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const ensResolver = useCallback(
-    async (ensName: string) => {
-      if (!library || chainId !== 1) {
-        const networkLibrary = getNetworkLibrary()
-        const network = await networkLibrary.getNetwork()
-        if (networkLibrary && network.chainId === 1) {
-          return resolveENSContentHash(ensName, networkLibrary)
+    (ensName: string) => {
+      if (!library || chainId !== ChainId.MAINNET) {
+        if (chainId === ChainId.MAINNET) {
+          const networkLibrary = getNetworkLibrary()
+          if (networkLibrary) {
+            return resolveENSContentHash(ensName, networkLibrary)
+          }
         }
         throw new Error('Could not construct mainnet ENS resolver')
       }
@@ -40,7 +42,14 @@ export function useFetchListCallback(): (listUrl: string, sendDispatch?: boolean
         })
         .catch((error) => {
           console.debug(`Failed to get list at url ${listUrl}`, error)
-          sendDispatch && dispatch(fetchTokenList.rejected({ url: listUrl, requestId, errorMessage: error.message }))
+          sendDispatch &&
+            dispatch(
+              fetchTokenList.rejected({
+                url: listUrl,
+                requestId,
+                errorMessage: error.message,
+              })
+            )
           throw error
         })
     },

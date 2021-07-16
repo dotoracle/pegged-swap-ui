@@ -1,30 +1,32 @@
-import { Percent, Token } from '@uniswap/sdk-core'
-import { computePairAddress, Pair } from '@uniswap/v2-sdk'
-import { SupportedLocale } from 'constants/locales'
-import JSBI from 'jsbi'
-import flatMap from 'lodash.flatmap'
-import { useCallback, useMemo } from 'react'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { V2_FACTORY_ADDRESSES } from '../../constants/addresses'
-import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from '../../constants/routing'
-import { useAllTokens } from '../../hooks/Tokens'
-import { useActiveWeb3React } from '../../hooks/web3'
-import { AppState } from '../index'
+import { AppDispatch, AppState } from '..'
+import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from '../../constants'
+import { ChainId, FACTORY_ADDRESS, JSBI, Pair, Percent, Token, computePairAddress } from '@sushiswap/sdk'
 import {
+  SerializedPair,
+  SerializedToken,
   addSerializedPair,
   addSerializedToken,
   removeSerializedToken,
-  SerializedPair,
-  SerializedToken,
-  updateArbitrumAlphaAcknowledged,
-  updateHideClosedPositions,
+  toggleURLWarning,
+  updateUserArcherETHTip,
+  updateUserArcherGasEstimate,
+  updateUserArcherGasPrice,
+  updateUserArcherTipManualOverride,
+  updateUserArcherUseRelay,
   updateUserDarkMode,
   updateUserDeadline,
   updateUserExpertMode,
-  updateUserLocale,
   updateUserSingleHopOnly,
   updateUserSlippageTolerance,
 } from './actions'
+import { shallowEqual, useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from '../hooks'
+import { useCallback, useMemo } from 'react'
+
+import ReactGA from 'react-ga'
+import flatMap from 'lodash/flatMap'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { useAllTokens } from '../../hooks/Tokens'
 
 function serializeToken(token: Token): SerializedToken {
   return {
@@ -47,7 +49,15 @@ function deserializeToken(serializedToken: SerializedToken): Token {
 }
 
 export function useIsDarkMode(): boolean {
-  return true
+  const { userDarkMode, matchesDarkMode } = useAppSelector(
+    ({ user: { matchesDarkMode, userDarkMode } }) => ({
+      userDarkMode,
+      matchesDarkMode,
+    }),
+    shallowEqual
+  )
+
+  return userDarkMode === null ? matchesDarkMode : userDarkMode
 }
 
 export function useDarkModeManager(): [boolean, () => void] {
@@ -59,24 +69,6 @@ export function useDarkModeManager(): [boolean, () => void] {
   }, [darkMode, dispatch])
 
   return [darkMode, toggleSetDarkMode]
-}
-
-export function useUserLocale(): SupportedLocale | null {
-  return useAppSelector((state) => state.user.userLocale)
-}
-
-export function useUserLocaleManager(): [SupportedLocale | null, (newLocale: SupportedLocale) => void] {
-  const dispatch = useAppDispatch()
-  const locale = useUserLocale()
-
-  const setLocale = useCallback(
-    (newLocale: SupportedLocale) => {
-      dispatch(updateUserLocale({ userLocale: newLocale }))
-    },
-    [dispatch]
-  )
-
-  return [locale, setLocale]
 }
 
 export function useIsExpertMode(): boolean {
@@ -101,6 +93,10 @@ export function useUserSingleHopOnly(): [boolean, (newSingleHopOnly: boolean) =>
 
   const setSingleHopOnly = useCallback(
     (newSingleHopOnly: boolean) => {
+      ReactGA.event({
+        category: 'Routing',
+        action: newSingleHopOnly ? 'enable single hop' : 'disable single hop',
+      })
       dispatch(updateUserSingleHopOnly({ userSingleHopOnly: newSingleHopOnly }))
     },
     [dispatch]
@@ -145,36 +141,9 @@ export function useUserSlippageTolerance(): Percent | 'auto' {
   )
 }
 
-export function useUserHideClosedPositions(): [boolean, (newHideClosedPositions: boolean) => void] {
-  const dispatch = useAppDispatch()
-
-  const hideClosedPositions = useAppSelector((state) => state.user.userHideClosedPositions)
-
-  const setHideClosedPositions = useCallback(
-    (newHideClosedPositions: boolean) => {
-      dispatch(updateHideClosedPositions({ userHideClosedPositions: newHideClosedPositions }))
-    },
-    [dispatch]
-  )
-
-  return [hideClosedPositions, setHideClosedPositions]
-}
-
-/**
- * Same as above but replaces the auto with a default value
- * @param defaultSlippageTolerance the default value to replace auto with
- */
-export function useUserSlippageToleranceWithDefault(defaultSlippageTolerance: Percent): Percent {
-  const allowedSlippage = useUserSlippageTolerance()
-  return useMemo(
-    () => (allowedSlippage === 'auto' ? defaultSlippageTolerance : allowedSlippage),
-    [allowedSlippage, defaultSlippageTolerance]
-  )
-}
-
 export function useUserTransactionTTL(): [number, (slippage: number) => void] {
-  const dispatch = useAppDispatch()
-  const userDeadline = useAppSelector((state) => {
+  const dispatch = useDispatch<AppDispatch>()
+  const userDeadline = useSelector<AppState, AppState['user']['userDeadline']>((state) => {
     return state.user.userDeadline
   })
 
@@ -189,7 +158,7 @@ export function useUserTransactionTTL(): [number, (slippage: number) => void] {
 }
 
 export function useAddUserToken(): (token: Token) => void {
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   return useCallback(
     (token: Token) => {
       dispatch(addSerializedToken({ serializedToken: serializeToken(token) }))
@@ -240,6 +209,11 @@ export function useURLWarningVisible(): boolean {
   return useAppSelector((state: AppState) => state.user.URLWarningVisible)
 }
 
+export function useURLWarningToggle(): () => void {
+  const dispatch = useAppDispatch()
+  return useCallback(() => dispatch(toggleURLWarning()), [dispatch])
+}
+
 /**
  * Given two tokens return the liquidity token that represents its liquidity shares
  * @param tokenA one of the two tokens
@@ -248,11 +222,11 @@ export function useURLWarningVisible(): boolean {
 export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
   if (tokenA.chainId !== tokenB.chainId) throw new Error('Not matching chain IDs')
   if (tokenA.equals(tokenB)) throw new Error('Tokens cannot be equal')
-  if (!V2_FACTORY_ADDRESSES[tokenA.chainId]) throw new Error('No V2 factory address on this chain')
+  if (!FACTORY_ADDRESS[tokenA.chainId]) throw new Error('No V2 factory address on this chain')
 
   return new Token(
     tokenA.chainId,
-    computePairAddress({ factoryAddress: V2_FACTORY_ADDRESSES[tokenA.chainId], tokenA, tokenB }),
+    computePairAddress({ factoryAddress: FACTORY_ADDRESS[tokenA.chainId], tokenA, tokenB }),
     18,
     'UNI-V2',
     'Uniswap V2'
@@ -326,12 +300,103 @@ export function useTrackedTokenPairs(): [Token, Token][] {
   }, [combinedList])
 }
 
-export function useArbitrumAlphaAlert(): [boolean, (arbitrumAlphaAcknowledged: boolean) => void] {
+export function useUserArcherUseRelay(): [boolean, (newUseRelay: boolean) => void] {
   const dispatch = useAppDispatch()
-  const arbitrumAlphaAcknowledged = useAppSelector(({ user }) => user.arbitrumAlphaAcknowledged)
-  const setArbitrumAlphaAcknowledged = (arbitrumAlphaAcknowledged: boolean) => {
-    dispatch(updateArbitrumAlphaAcknowledged({ arbitrumAlphaAcknowledged }))
-  }
 
-  return [arbitrumAlphaAcknowledged, setArbitrumAlphaAcknowledged]
+  const useRelay = useSelector<AppState, AppState['user']['userArcherUseRelay']>(
+    (state) => state.user.userArcherUseRelay
+  )
+
+  const setUseRelay = useCallback(
+    (newUseRelay: boolean) => {
+      dispatch(updateUserArcherUseRelay({ userArcherUseRelay: newUseRelay }))
+    },
+    [dispatch]
+  )
+
+  return [useRelay, setUseRelay]
+}
+
+export function useUserArcherGasPrice(): [string, (newGasPrice: string) => void] {
+  const dispatch = useAppDispatch()
+  const userGasPrice = useSelector<AppState, AppState['user']['userArcherGasPrice']>((state) => {
+    return state.user.userArcherGasPrice
+  })
+
+  const setUserGasPrice = useCallback(
+    (newGasPrice: string) => {
+      dispatch(updateUserArcherGasPrice({ userArcherGasPrice: newGasPrice }))
+    },
+    [dispatch]
+  )
+
+  return [userGasPrice, setUserGasPrice]
+}
+
+export function useUserArcherETHTip(): [string, (newETHTip: string) => void] {
+  const dispatch = useAppDispatch()
+  const userETHTip = useSelector<AppState, AppState['user']['userArcherETHTip']>((state) => {
+    return state.user.userArcherETHTip
+  })
+
+  const setUserETHTip = useCallback(
+    (newETHTip: string) => {
+      dispatch(updateUserArcherETHTip({ userArcherETHTip: newETHTip }))
+    },
+    [dispatch]
+  )
+
+  return [userETHTip, setUserETHTip]
+}
+
+export function useUserArcherGasEstimate(): [string, (newGasEstimate: string) => void] {
+  const dispatch = useAppDispatch()
+  const userGasEstimate = useSelector<AppState, AppState['user']['userArcherGasEstimate']>((state) => {
+    return state.user.userArcherGasEstimate
+  })
+
+  const setUserGasEstimate = useCallback(
+    (newGasEstimate: string) => {
+      dispatch(
+        updateUserArcherGasEstimate({
+          userArcherGasEstimate: newGasEstimate,
+        })
+      )
+    },
+    [dispatch]
+  )
+
+  return [userGasEstimate, setUserGasEstimate]
+}
+
+export function useUserArcherTipManualOverride(): [boolean, (newManualOverride: boolean) => void] {
+  const dispatch = useAppDispatch()
+  const userTipManualOverride = useSelector<AppState, AppState['user']['userArcherTipManualOverride']>((state) => {
+    return state.user.userArcherTipManualOverride
+  })
+
+  const setUserTipManualOverride = useCallback(
+    (newManualOverride: boolean) => {
+      dispatch(
+        updateUserArcherTipManualOverride({
+          userArcherTipManualOverride: newManualOverride,
+        })
+      )
+    },
+    [dispatch]
+  )
+
+  return [userTipManualOverride, setUserTipManualOverride]
+}
+
+/**
+ * Same as above but replaces the auto with a default value
+ * @param defaultSlippageTolerance the default value to replace auto with
+ */
+export function useUserSlippageToleranceWithDefault(defaultSlippageTolerance: Percent): Percent {
+  const allowedSlippage = useUserSlippageTolerance()
+  return useMemo(
+    () => (allowedSlippage === 'auto' ? defaultSlippageTolerance : allowedSlippage),
+    [allowedSlippage, defaultSlippageTolerance]
+  )
 }

@@ -1,17 +1,16 @@
-import { t } from '@lingui/macro'
-import JSBI from 'jsbi'
-import { Token, Currency, Percent, CurrencyAmount } from '@uniswap/sdk-core'
-import { Pair } from '@uniswap/v2-sdk'
-import { useCallback } from 'react'
-import { useV2Pair } from '../../hooks/useV2Pairs'
-import { useTotalSupply } from '../../hooks/useTotalSupply'
-
-import { useActiveWeb3React } from '../../hooks/web3'
-import { AppState } from '../index'
-import { tryParseAmount } from '../swap/hooks'
-import { useTokenBalances } from '../wallet/hooks'
+import { Currency, CurrencyAmount, JSBI, Pair, Percent, Token } from '@sushiswap/sdk'
 import { Field, typeInput } from './actions'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
+import { useAppDispatch, useAppSelector } from '../hooks'
+
+import { AppState } from '../index'
+import { t } from '@lingui/macro'
+import { tryParseAmount } from '../../functions/parse'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
+import { useCallback } from 'react'
+import { useLingui } from '@lingui/react'
+import { useTokenBalances } from '../wallet/hooks'
+import { useTotalSupply } from '../../hooks/useTotalSupply'
+import { useV2Pair } from '../../hooks/useV2Pairs'
 
 export function useBurnState(): AppState['burn'] {
   return useAppSelector((state) => state.burn)
@@ -30,7 +29,9 @@ export function useDerivedBurnInfo(
   }
   error?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
+
+  const { i18n } = useLingui()
 
   const { independentField, typedValue } = useBurnState()
 
@@ -50,6 +51,7 @@ export function useDerivedBurnInfo(
 
   // liquidity values
   const totalSupply = useTotalSupply(pair?.liquidityToken)
+
   const liquidityValueA =
     pair &&
     totalSupply &&
@@ -59,6 +61,7 @@ export function useDerivedBurnInfo(
     JSBI.greaterThanOrEqual(totalSupply.quotient, userLiquidity.quotient)
       ? CurrencyAmount.fromRawAmount(tokenA, pair.getLiquidityValue(tokenA, totalSupply, userLiquidity, false).quotient)
       : undefined
+
   const liquidityValueB =
     pair &&
     totalSupply &&
@@ -68,7 +71,11 @@ export function useDerivedBurnInfo(
     JSBI.greaterThanOrEqual(totalSupply.quotient, userLiquidity.quotient)
       ? CurrencyAmount.fromRawAmount(tokenB, pair.getLiquidityValue(tokenB, totalSupply, userLiquidity, false).quotient)
       : undefined
-  const liquidityValues: { [Field.CURRENCY_A]?: CurrencyAmount<Token>; [Field.CURRENCY_B]?: CurrencyAmount<Token> } = {
+
+  const liquidityValues: {
+    [Field.CURRENCY_A]?: CurrencyAmount<Token>
+    [Field.CURRENCY_B]?: CurrencyAmount<Token>
+  } = {
     [Field.CURRENCY_A]: liquidityValueA,
     [Field.CURRENCY_B]: liquidityValueB,
   }
@@ -124,11 +131,11 @@ export function useDerivedBurnInfo(
 
   let error: string | undefined
   if (!account) {
-    error = t`Connect Wallet`
+    error = i18n._(t`Connect Wallet`)
   }
 
   if (!parsedAmounts[Field.LIQUIDITY] || !parsedAmounts[Field.CURRENCY_A] || !parsedAmounts[Field.CURRENCY_B]) {
-    error = error ?? t`Enter an amount`
+    error = error ?? i18n._(t`Enter an amount`)
   }
 
   return { pair, parsedAmounts, error }

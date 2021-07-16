@@ -1,13 +1,13 @@
-import JSBI from 'jsbi'
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
-import { TransactionResponse } from '@ethersproject/providers'
+import { ChainId, Currency, CurrencyAmount, JSBI, Token } from '@sushiswap/sdk'
+import { MERKLE_ROOT, SUSHI } from './../../constants/index'
+import { getAddress, isAddress } from '@ethersproject/address'
 import { useEffect, useState } from 'react'
-import { UNI } from '../../constants/tokens'
-import { useActiveWeb3React } from '../../hooks/web3'
+
+import { TransactionResponse } from '@ethersproject/providers'
+import { calculateGasMargin } from '../../functions/trade'
+import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
 import { useMerkleDistributorContract } from '../../hooks/useContract'
-import { calculateGasMargin } from '../../utils/calculateGasMargin'
 import { useSingleCallResult } from '../multicall/hooks'
-import { isAddress } from '../../utils'
 import { useTransactionAdder } from '../transactions/hooks'
 
 interface UserClaimData {
@@ -21,104 +21,55 @@ interface UserClaimData {
   }
 }
 
-type LastAddress = string
-type ClaimAddressMapping = { [firstAddress: string]: LastAddress }
-let FETCH_CLAIM_MAPPING_PROMISE: Promise<ClaimAddressMapping> | null = null
-function fetchClaimMapping(): Promise<ClaimAddressMapping> {
-  return (
-    FETCH_CLAIM_MAPPING_PROMISE ??
-    (FETCH_CLAIM_MAPPING_PROMISE = fetch(
-      `https://raw.githubusercontent.com/Uniswap/mrkl-drop-data-chunks/final/chunks/mapping.json`
-    )
-      .then((res) => res.json())
-      .catch((error) => {
-        console.error('Failed to get claims mapping', error)
-        FETCH_CLAIM_MAPPING_PROMISE = null
-      }))
-  )
-}
+const CLAIM_PROMISES: { [key: string]: Promise<any | UserClaimData | null> } = {}
 
-const FETCH_CLAIM_FILE_PROMISES: { [startingAddress: string]: Promise<{ [address: string]: UserClaimData }> } = {}
-function fetchClaimFile(key: string): Promise<{ [address: string]: UserClaimData }> {
-  return (
-    FETCH_CLAIM_FILE_PROMISES[key] ??
-    (FETCH_CLAIM_FILE_PROMISES[key] = fetch(
-      `https://raw.githubusercontent.com/Uniswap/mrkl-drop-data-chunks/final/chunks/${key}.json`
-    )
-      .then((res) => res.json())
-      .catch((error) => {
-        console.error(`Failed to get claim file mapping for starting address ${key}`, error)
-        delete FETCH_CLAIM_FILE_PROMISES[key]
-      }))
-  )
-}
-
-const FETCH_CLAIM_PROMISES: { [key: string]: Promise<UserClaimData> } = {}
 // returns the claim for the given address, or null if not valid
-function fetchClaim(account: string): Promise<UserClaimData> {
-  const formatted = isAddress(account)
-  if (!formatted) return Promise.reject(new Error('Invalid address'))
+function fetchClaim(account: string, chainId: ChainId): Promise<any | UserClaimData | null> {
+  if (!isAddress(account)) return Promise.reject(new Error('Invalid address'))
+  const key = `${chainId}:${account}`
+  // console.log('CLAIM_PROMISE:', CLAIM_PROMISES[key], key)
+  return (CLAIM_PROMISES[key] =
+    CLAIM_PROMISES[key] ??
+    fetch(MERKLE_ROOT)
+      .then((response) => response.json())
+      .then((data) => {
+        const claim: typeof data.claims[0] | undefined = data.claims[getAddress(account)] ?? undefined
+        if (!claim) return null
 
-  return (
-    FETCH_CLAIM_PROMISES[account] ??
-    (FETCH_CLAIM_PROMISES[account] = fetchClaimMapping()
-      .then((mapping) => {
-        const sorted = Object.keys(mapping).sort((a, b) => (a.toLowerCase() < b.toLowerCase() ? -1 : 1))
-
-        for (const startingAddress of sorted) {
-          const lastAddress = mapping[startingAddress]
-          if (startingAddress.toLowerCase() <= formatted.toLowerCase()) {
-            if (formatted.toLowerCase() <= lastAddress.toLowerCase()) {
-              return startingAddress
-            }
-          } else {
-            throw new Error(`Claim for ${formatted} was not found in partial search`)
-          }
+        // console.log('claim:', claim)
+        return {
+          index: claim.index,
+          amount: claim.amount,
+          proof: claim.proof,
         }
-        throw new Error(`Claim for ${formatted} was not found after searching all mappings`)
       })
-      .then(fetchClaimFile)
-      .then((result) => {
-        if (result[formatted]) return result[formatted]
-        throw new Error(`Claim for ${formatted} was not found in claim file!`)
-      })
-      .catch((error) => {
-        console.debug('Claim fetch failed', error)
-        throw error
-      }))
-  )
+      .catch((error) => console.error('Failed to get claim data', error)))
 }
 
 // parse distributorContract blob and detect if user has claim data
 // null means we know it does not
-export function useUserClaimData(account: string | null | undefined): UserClaimData | null {
+export function useUserClaimData(account: string | null | undefined): UserClaimData | null | undefined {
   const { chainId } = useActiveWeb3React()
 
-  const [claimInfo, setClaimInfo] = useState<{ [account: string]: UserClaimData | null }>({})
+  const key = `${chainId}:${account}`
+  const [claimInfo, setClaimInfo] = useState<{
+    [key: string]: UserClaimData | null
+  }>({})
 
   useEffect(() => {
-    if (!account || chainId !== 1) return
-
-    fetchClaim(account)
-      .then((accountClaimInfo) =>
-        setClaimInfo((claimInfo) => {
-          return {
-            ...claimInfo,
-            [account]: accountClaimInfo,
-          }
-        })
-      )
-      .catch(() => {
-        setClaimInfo((claimInfo) => {
-          return {
-            ...claimInfo,
-            [account]: null,
-          }
-        })
+    if (!account || !chainId) return
+    fetchClaim(account, chainId).then((accountClaimInfo) =>
+      setClaimInfo((claimInfo) => {
+        // console.log('claimInfo:', claimInfo, accountClaimInfo, key)
+        return {
+          ...claimInfo,
+          [key]: accountClaimInfo,
+        }
       })
-  }, [account, chainId])
+    )
+  }, [account, chainId, key])
 
-  return account && chainId === 1 ? claimInfo[account] : null
+  return account && chainId ? claimInfo[key] : undefined
 }
 
 // check if user is in blob and has not yet claimed UNI
@@ -130,17 +81,24 @@ export function useUserHasAvailableClaim(account: string | null | undefined): bo
   return Boolean(userClaimData && !isClaimedResult.loading && isClaimedResult.result?.[0] === false)
 }
 
-export function useUserUnclaimedAmount(account: string | null | undefined): CurrencyAmount<Token> | undefined {
+export function useUserUnclaimedAmount(account: string | null | undefined): CurrencyAmount<Currency> | undefined {
   const { chainId } = useActiveWeb3React()
   const userClaimData = useUserClaimData(account)
   const canClaim = useUserHasAvailableClaim(account)
 
-  const uni = chainId ? UNI[chainId] : undefined
-  if (!uni) return undefined
+  const sushi = chainId ? SUSHI[chainId] : undefined
+
+  // console.log('claimStats:', {
+  //   canClaim: canClaim,
+  //   userClaimData: userClaimData,
+  //   sushi: sushi
+  // })
+
+  if (!sushi) return undefined
   if (!canClaim || !userClaimData) {
-    return CurrencyAmount.fromRawAmount(uni, JSBI.BigInt(0))
+    return CurrencyAmount.fromRawAmount(sushi, JSBI.BigInt(0))
   }
-  return CurrencyAmount.fromRawAmount(uni, JSBI.BigInt(userClaimData.amount))
+  return CurrencyAmount.fromRawAmount(sushi, JSBI.BigInt(userClaimData.amount))
 }
 
 export function useClaimCallback(account: string | null | undefined): {
@@ -151,7 +109,7 @@ export function useClaimCallback(account: string | null | undefined): {
   const claimData = useUserClaimData(account)
 
   // used for popup summary
-  const unclaimedAmount: CurrencyAmount<Token> | undefined = useUserUnclaimedAmount(account)
+  const unClaimedAmount: CurrencyAmount<Currency> | undefined = useUserUnclaimedAmount(account)
   const addTransaction = useTransactionAdder()
   const distributorContract = useMerkleDistributorContract()
 
@@ -162,10 +120,13 @@ export function useClaimCallback(account: string | null | undefined): {
 
     return distributorContract.estimateGas['claim'](...args, {}).then((estimatedGasLimit) => {
       return distributorContract
-        .claim(...args, { value: null, gasLimit: calculateGasMargin(chainId, estimatedGasLimit) })
+        .claim(...args, {
+          value: null,
+          gasLimit: calculateGasMargin(estimatedGasLimit),
+        })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Claimed ${unclaimedAmount?.toSignificant(4)} UNI`,
+            summary: `Claimed ${unClaimedAmount?.toSignificant(4)} SUSHI`,
             claim: { recipient: account },
           })
           return response.hash

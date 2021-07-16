@@ -1,125 +1,33 @@
-import { t, Trans } from '@lingui/macro'
-import { useContext, useRef, useState } from 'react'
-import { Settings, X } from 'react-feather'
-import ReactGA from 'react-ga'
-import { Text } from 'rebass'
-import styled, { ThemeContext } from 'styled-components/macro'
-import { useOnClickOutside } from '../../hooks/useOnClickOutside'
-import { ApplicationModal } from '../../state/application/actions'
+import React, { useRef, useState } from 'react'
+import {
+  useExpertModeManager,
+  useUserArcherUseRelay,
+  useUserSingleHopOnly,
+  useUserTransactionTTL,
+} from '../../state/user/hooks'
 import { useModalOpen, useToggleSettingsMenu } from '../../state/application/hooks'
-import { useExpertModeManager, useUserSingleHopOnly } from '../../state/user/hooks'
-import { TYPE } from '../../theme'
-import { ButtonError } from '../Button'
-import { AutoColumn } from '../Column'
+
+import { ApplicationModal } from '../../state/application/actions'
+import Button from '../Button'
 import Modal from '../Modal'
+import ModalHeader from '../ModalHeader'
+import { ChainId, Percent } from '@sushiswap/sdk'
 import QuestionHelper from '../QuestionHelper'
-import { RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
 import TransactionSettings from '../TransactionSettings'
-import { Percent } from '@uniswap/sdk-core'
-
-const StyledMenuIcon = styled(Settings)`
-  height: 20px;
-  width: 20px;
-
-  > * {
-    stroke: ${({ theme }) => theme.text2};
-  }
-
-  :hover {
-    opacity: 0.7;
-  }
-`
-
-const StyledCloseIcon = styled(X)`
-  height: 20px;
-  width: 20px;
-  :hover {
-    cursor: pointer;
-  }
-
-  > * {
-    stroke: ${({ theme }) => theme.text1};
-  }
-`
-
-const StyledMenuButton = styled.button`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background-color: transparent;
-  margin: 0;
-  padding: 0;
-  border-radius: 0.5rem;
-  height: 20px;
-
-  :hover,
-  :focus {
-    cursor: pointer;
-    outline: none;
-  }
-`
-const EmojiWrapper = styled.div`
-  position: absolute;
-  bottom: -6px;
-  right: 0px;
-  font-size: 14px;
-`
-
-const StyledMenu = styled.div`
-  margin-left: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  border: none;
-  text-align: left;
-`
-
-const MenuFlyout = styled.span`
-  min-width: 20.125rem;
-  background-color: ${({ theme }) => theme.bg2};
-  border: 1px solid ${({ theme }) => theme.bg3};
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.01);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  font-size: 1rem;
-  position: absolute;
-  top: 2rem;
-  right: 0rem;
-  z-index: 100;
-
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    min-width: 18.125rem;
-  `};
-
-  user-select: none;
-`
-
-const Break = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: ${({ theme }) => theme.bg3};
-`
-
-const ModalContentWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 0;
-  background-color: ${({ theme }) => theme.bg2};
-  border-radius: 20px;
-`
+import Typography from '../Typography'
+import { t } from '@lingui/macro'
+import { useLingui } from '@lingui/react'
+import { useOnClickOutside } from '../../hooks/useOnClickOutside'
+import { useActiveWeb3React } from '../../hooks'
 
 export default function SettingsTab({ placeholderSlippage }: { placeholderSlippage: Percent }) {
-  const node = useRef<HTMLDivElement>()
+  const { i18n } = useLingui()
+  const { chainId } = useActiveWeb3React()
+
+  const node = useRef<HTMLDivElement>(null)
   const open = useModalOpen(ApplicationModal.SETTINGS)
   const toggle = useToggleSettingsMenu()
-
-  const theme = useContext(ThemeContext)
 
   const [expertMode, toggleExpertMode] = useExpertModeManager()
 
@@ -130,80 +38,54 @@ export default function SettingsTab({ placeholderSlippage }: { placeholderSlippa
 
   useOnClickOutside(node, open ? toggle : undefined)
 
+  const [ttl, setTtl] = useUserTransactionTTL()
+
+  const [userUseArcher, setUserUseArcher] = useUserArcherUseRelay()
+
   return (
-    // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/30451
-    <StyledMenu ref={node as any}>
-      <Modal isOpen={showConfirmation} onDismiss={() => setShowConfirmation(false)} maxHeight={100}>
-        <ModalContentWrapper>
-          <AutoColumn gap="lg">
-            <RowBetween style={{ padding: '0 2rem' }}>
-              <div />
-              <Text fontWeight={500} fontSize={20}>
-                <Trans>Are you sure?</Trans>
-              </Text>
-              <StyledCloseIcon onClick={() => setShowConfirmation(false)} />
-            </RowBetween>
-            <Break />
-            <AutoColumn gap="lg" style={{ padding: '0 2rem' }}>
-              <Text fontWeight={500} fontSize={20}>
-                <Trans>
-                  Expert mode turns off the confirm transaction prompt and allows high slippage trades that often result
-                  in bad rates and lost funds.
-                </Trans>
-              </Text>
-              <Text fontWeight={600} fontSize={20}>
-                <Trans>ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.</Trans>
-              </Text>
-              <ButtonError
-                error={true}
-                padding={'12px'}
-                onClick={() => {
-                  const confirmWord = t`confirm`
-                  if (window.prompt(t`Please type the word "${confirmWord}" to enable expert mode.`) === confirmWord) {
-                    toggleExpertMode()
-                    setShowConfirmation(false)
-                  }
-                }}
-              >
-                <Text fontSize={20} fontWeight={500} id="confirm-expert-mode">
-                  <Trans>Turn On Expert Mode</Trans>
-                </Text>
-              </ButtonError>
-            </AutoColumn>
-          </AutoColumn>
-        </ModalContentWrapper>
-      </Modal>
-      <StyledMenuButton onClick={toggle} id="open-settings-dialog-button">
-        <StyledMenuIcon />
-        {expertMode ? (
-          <EmojiWrapper>
-            <span role="img" aria-label="wizard-icon">
-              🧙
-            </span>
-          </EmojiWrapper>
-        ) : null}
-      </StyledMenuButton>
+    <div className="flex relative" ref={node}>
+      <div
+        className="rounded h-8 w-8 flex items-center justify-center cursor-pointer"
+        onClick={toggle}
+        id="open-settings-dialog-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5 transform rotate-90"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+          />
+        </svg>
+      </div>
       {open && (
-        <MenuFlyout>
-          <AutoColumn gap="md" style={{ padding: '1rem' }}>
-            <Text fontWeight={600} fontSize={14}>
-              <Trans>Transaction Settings</Trans>
-            </Text>
+        <div className="absolute top-14 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 bg-dark-900 border-2 border-dark-800 rounded w-80 shadow-lg">
+          <div className="p-4 space-y-4">
+            <Typography weight={700} className="text-high-emphesis">
+              {i18n._(t`Transaction Settings`)}
+            </Typography>
+
             <TransactionSettings placeholderSlippage={placeholderSlippage} />
-            <Text fontWeight={600} fontSize={14}>
-              <Trans>Interface Settings</Trans>
-            </Text>
-            <RowBetween>
-              <RowFixed>
-                <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
-                  <Trans>Toggle Expert Mode</Trans>
-                </TYPE.black>
+
+            <Typography className="text-high-emphesis" weight={700}>
+              {i18n._(t`Interface Settings`)}
+            </Typography>
+
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <Typography variant="sm" className="text-primary">
+                  {i18n._(t`Toggle Expert Mode`)}
+                </Typography>
                 <QuestionHelper
-                  text={
-                    <Trans>Allow high price impact trades and skip the confirm screen. Use at your own risk.</Trans>
-                  }
+                  text={i18n._(t`Bypasses confirmation modals and allows high slippage trades. Use at your own risk.`)}
                 />
-              </RowFixed>
+              </div>
               <Toggle
                 id="toggle-expert-mode-button"
                 isActive={expertMode}
@@ -219,29 +101,69 @@ export default function SettingsTab({ placeholderSlippage }: { placeholderSlippa
                       }
                 }
               />
-            </RowBetween>
-            <RowBetween>
-              <RowFixed>
-                <TYPE.black fontWeight={400} fontSize={14} color={theme.text2}>
-                  <Trans>Disable Multihops</Trans>
-                </TYPE.black>
-                <QuestionHelper text={<Trans>Restricts swaps to direct pairs only.</Trans>} />
-              </RowFixed>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <Typography variant="sm" className="text-primary">
+                  {i18n._(t`Disable Multihops`)}
+                </Typography>
+                <QuestionHelper text={i18n._(t`Restricts swaps to direct pairs only.`)} />
+              </div>
               <Toggle
                 id="toggle-disable-multihop-button"
                 isActive={singleHopOnly}
-                toggle={() => {
-                  ReactGA.event({
-                    category: 'Routing',
-                    action: singleHopOnly ? 'disable single hop' : 'enable single hop',
-                  })
-                  setSingleHopOnly(!singleHopOnly)
-                }}
+                toggle={() => (singleHopOnly ? setSingleHopOnly(false) : setSingleHopOnly(true))}
               />
-            </RowBetween>
-          </AutoColumn>
-        </MenuFlyout>
+            </div>
+            {chainId == ChainId.MAINNET && (
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <Typography variant="sm" className="text-primary">
+                    {i18n._(t`MEV Shield by Archer DAO`)}
+                  </Typography>
+                  <QuestionHelper
+                    text={i18n._(
+                      t`Send transaction privately to avoid front-running and sandwich attacks. Requires a miner tip to incentivize miners`
+                    )}
+                  />
+                </div>
+                <Toggle
+                  id="toggle-use-archer"
+                  isActive={userUseArcher}
+                  toggle={() => setUserUseArcher(!userUseArcher)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       )}
-    </StyledMenu>
+
+      <Modal isOpen={showConfirmation} onDismiss={() => setShowConfirmation(false)}>
+        <div className="space-y-4">
+          <ModalHeader title={i18n._(t`Are you sure?`)} onClose={() => setShowConfirmation(false)} />
+          <Typography variant="lg">
+            {i18n._(t`Expert mode turns off the confirm transaction prompt and allows high slippage trades
+                                that often result in bad rates and lost funds.`)}
+          </Typography>
+          <Typography variant="sm" className="font-medium">
+            {i18n._(t`ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.`)}
+          </Typography>
+          <Button
+            color="red"
+            size="lg"
+            onClick={() => {
+              if (window.prompt(i18n._(t`Please type the word "confirm" to enable expert mode.`)) === 'confirm') {
+                toggleExpertMode()
+                setShowConfirmation(false)
+              }
+            }}
+          >
+            <Typography variant="lg" id="confirm-expert-mode">
+              {i18n._(t`Turn On Expert Mode`)}
+            </Typography>
+          </Button>
+        </div>
+      </Modal>
+    </div>
   )
 }

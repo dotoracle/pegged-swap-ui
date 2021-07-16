@@ -1,10 +1,8 @@
-import { Currency, CurrencyAmount, Percent } from '@uniswap/sdk-core'
-import { useMemo } from 'react'
-import useTheme from '../../hooks/useTheme'
-import { TYPE } from '../../theme'
-import { warningSeverity } from '../../utils/prices'
-import HoverInlineText from 'components/HoverInlineText'
-import { Trans } from '@lingui/macro'
+import { Currency, CurrencyAmount, Percent } from '@sushiswap/sdk'
+import React, { useMemo } from 'react'
+
+import { t } from '@lingui/macro'
+import { warningSeverity } from '../../functions/prices'
 
 export function FiatValue({
   fiatValue,
@@ -13,31 +11,25 @@ export function FiatValue({
   fiatValue: CurrencyAmount<Currency> | null | undefined
   priceImpact?: Percent
 }) {
-  const theme = useTheme()
-  const priceImpactColor = useMemo(() => {
+  const priceImpactClassName = useMemo(() => {
     if (!priceImpact) return undefined
-    if (priceImpact.lessThan('0')) return theme.green1
+    if (priceImpact.lessThan('0')) return 'text-green'
     const severity = warningSeverity(priceImpact)
-    if (severity < 1) return theme.text3
-    if (severity < 3) return theme.yellow1
-    return theme.red1
-  }, [priceImpact, theme.green1, theme.red1, theme.text3, theme.yellow1])
+    if (severity < 1) return 'text-secondary'
+    if (severity < 3) return 'text-yellow'
+    return 'text-red'
+  }, [priceImpact])
 
   return (
-    <TYPE.body fontSize={14} color={fiatValue ? theme.text2 : theme.text4}>
+    <div className="flex justify-end space-x-1 text-xs font-medium text-right text-secondary">
       {fiatValue ? (
-        <Trans>
-          ~$ <HoverInlineText text={fiatValue?.toSignificant(6, { groupSeparator: ',' })} />
-        </Trans>
+        <>
+          ≈$ <div className="cursor-pointer">{fiatValue?.toSignificant(6, { groupSeparator: ',' })}</div>
+        </>
       ) : (
         ''
       )}
-      {priceImpact ? (
-        <span style={{ color: priceImpactColor }}>
-          {' '}
-          (<Trans>{priceImpact.multiply(-1).toSignificant(3)}%</Trans>)
-        </span>
-      ) : null}
-    </TYPE.body>
+      {priceImpact ? <span className={priceImpactClassName}>{priceImpact.multiply(-1).toSignificant(3)}%</span> : null}
+    </div>
   )
 }

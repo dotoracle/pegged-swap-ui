@@ -1,0 +1,24 @@
+{
+  "background_color": "#fff",
+  "display": "standalone",
+  "homepage_url": "https://app.uniswap.org",
+  "icons": [
+    {
+      "src": "./logo192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait",
+  "name": "DTO Pegged Swap",
+  "short_name": "DTO Pegged Swap",
+  "start_url": ".",
+  "theme_color": "#e2007a"
+}

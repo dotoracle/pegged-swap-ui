@@ -1,4 +1,5 @@
-import { Currency, Token } from '@uniswap/sdk-core'
+import { Currency, Token } from '@sushiswap/sdk'
+
 import { useMemo } from 'react'
 import { useUnsupportedTokens } from './Tokens'
 
