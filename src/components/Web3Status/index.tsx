@@ -113,6 +113,7 @@ function StatusIcon({ connector }: { connector: AbstractConnector }) {
 }
 
 function Web3StatusInner() {
+  console.log()
   const { account, connector, error } = useWeb3React()
 
   const { ENSName } = useENSName(account ?? undefined)
