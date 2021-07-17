@@ -6,7 +6,7 @@
     "analyze": "ANALYZE=true yarn build && serve .next -n",
     "dev": "next dev",
     "inspect": "NODE_OPTIONS='--inspect' next dev",
-    "build": "yarn lingui && next build",
+    "build": "next build",
     "start": "next start",
     "lingui": "lingui extract && lingui compile",
     "lokalise": "lokalise2 --config lokalise.yaml file download --format po --unzip-to . --original-filenames=false",
@@ -137,5 +137,10 @@
     "entrypoints": [
       "src/pages"
     ]
+  },
+  "dependencies": {
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier-react": "^0.0.24",
+    "eslint-plugin-prettier": "^3.4.0"
   }
 }

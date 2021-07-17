@@ -1,7 +1,15 @@
 {
-  // "extends": ["next", "next/core-web-vitals"]
   "extends": ["next"],
+  "plugins": ["prettier"],
   "rules": {
-    "react/display-name": "off"
+    "react/display-name": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "semi": false,
+        "singleQuote": true,
+        "printWidth": 120
+      }
+    ]
   }
 }

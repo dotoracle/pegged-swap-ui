@@ -425,7 +425,7 @@ export default function Swap() {
   return (
     <>
       <Head>
-        <title>{i18n._(t`SushiSwap`)} | Sushi</title>
+        <title>DTO | Pegged Swap</title>
         <meta
           key="description"
           name="description"
@@ -563,7 +563,7 @@ export default function Swap() {
             <div className="px-5 mt-1">{doArcher && userHasSpecifiedInputOutput && <MinerTip />}</div>
           </div>
         )}
-        {/* 
+        {/*
         {trade && (
           <div className="p-5 rounded bg-dark-800">
             <AdvancedSwapDetails trade={trade} allowedSlippage={allowedSlippage} />
