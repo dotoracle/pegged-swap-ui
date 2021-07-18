@@ -31,6 +31,8 @@
     "@binance-chain/bsc-connector": "^1.0.0",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@dotoracle/default-token-list": "^0.0.1",
+    "dotoracle-sdk": "^0.0.1",
     "@ethereumjs/common": "^2.3.0",
     "@ethereumjs/tx": "^3.2.0",
     "@ethersproject/abi": "^5.4.0",
@@ -55,7 +57,6 @@
     "@reduxjs/toolkit": "^1.6.0",
     "@sushiswap/chainlink-whitelist": "0.2.2",
     "@sushiswap/core": "2.0.0-canary.0",
-    "@sushiswap/default-token-list": "7.5.0",
     "@sushiswap/sushi-data": "^1.0.24",
     "@tailwindcss/jit": "^0.1.18",
     "@transak/transak-sdk": "^1.0.28",
@@ -80,6 +81,9 @@
     "copy-to-clipboard": "^3.3.1",
     "eslint": "^7.30.0",
     "eslint-config-next": "^11.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier-react": "^0.0.24",
+    "eslint-plugin-prettier": "^3.4.0",
     "eth-permit": "^0.1.10",
     "ethers": "^5.4.1",
     "fathom-client": "^3.0.0",
@@ -136,11 +140,5 @@
     "entrypoints": [
       "src/pages"
     ]
-  },
-  "dependencies": {
-    "dotoracle-sdk": "^0.0.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-prettier-react": "^0.0.24",
-    "eslint-plugin-prettier": "^3.4.0"
   }
 }

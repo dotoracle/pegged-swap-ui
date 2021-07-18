@@ -1189,6 +1189,11 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
+"@dotoracle/default-token-list@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@dotoracle/default-token-list/-/default-token-list-0.0.1.tgz#6de6c7c4b845008191dda394aa758c9054b8ae0b"
+  integrity sha512-wavmIoc1DkCcDhJT3aGNtLM8hDs5IoQLNdSlxlLUBKXueQxDyJKzLyRfv3Swc3e+7HouVEVViTtPxoA9g60Ebw==
+
 "@emotion/is-prop-valid@^0.8.8":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"
@@ -2292,11 +2297,6 @@
   version "2.0.0-canary.0"
   resolved "https://registry.yarnpkg.com/@sushiswap/core/-/core-2.0.0-canary.0.tgz#582605e6968f634684da7cc3308c3353595e326b"
   integrity sha512-dr+GL+KmAOpQva/NlcIij061LZFUMUv2S5o8HZvGK4vOKvWX9apzlBn9ZRS73Kj5ASKu8x4hc+ExD8XGLIxvjw==
-
-"@sushiswap/default-token-list@7.5.0":
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/@sushiswap/default-token-list/-/default-token-list-7.5.0.tgz#ebd731bbd8772d72b40dcb12c639a115fe38bd1a"
-  integrity sha512-jcfkMOgP16hNEMdCnjl/anLBhrcwscMTFmUqZZB2T9myhUr1VhLQKuewcm4rMP3G5q61OrbHjYvNMbrP7rE0HQ==
 
 "@sushiswap/sushi-data@^1.0.24":
   version "1.0.26"
