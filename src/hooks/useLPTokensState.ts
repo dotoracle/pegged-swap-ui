@@ -1,4 +1,4 @@
-import { ChainId, CurrencyAmount, Token } from '@sushiswap/sdk'
+import { ChainId, CurrencyAmount, Token } from 'dotoracle-sdk'
 import { useBoringHelperContract, useDashboardContract, useQuickSwapFactoryContract } from '../hooks/useContract'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

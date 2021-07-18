@@ -1,10 +1,10 @@
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { BAR_ADDRESS, ZERO } from '@sushiswap/sdk'
+import { BAR_ADDRESS, ZERO } from 'dotoracle-sdk'
 import React, { useEffect, useState } from 'react'
 import { SUSHI, XSUSHI } from '../../constants'
 
 import Button from '../../components/Button'
-import { ChainId } from '@sushiswap/sdk'
+import { ChainId } from 'dotoracle-sdk'
 import Dots from '../../components/Dots'
 import Head from 'next/head'
 import Image from 'next/image'

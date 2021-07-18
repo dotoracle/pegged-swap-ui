@@ -1,6 +1,6 @@
 import { ExchangeRateCheckBox, SwapCheckbox } from './Checkbox'
 import { KashiApproveButton, TokenApproveButton } from './Button'
-import { Percent, WNATIVE } from '@sushiswap/sdk'
+import { Percent, WNATIVE } from 'dotoracle-sdk'
 import React, { useContext, useMemo, useState } from 'react'
 import { SUSHISWAP_MULTISWAPPER_ADDRESS, SUSHISWAP_MULTI_EXACT_SWAPPER_ADDRESS } from '../../constants/kashi'
 import { Warning, Warnings } from '../../entities/Warnings'

@@ -1,5 +1,5 @@
 import BSC from './bsc'
-import { ChainId } from '@sushiswap/sdk'
+import { ChainId } from 'dotoracle-sdk'
 import HECO from './heco'
 import KOVAN from './kovan'
 import MAINNET from './mainnet'

@@ -1,4 +1,4 @@
-import { ChainId } from '@sushiswap/sdk'
+import { ChainId } from 'dotoracle-sdk'
 
 const Arbitrum = '/images/networks/arbitrum-network.jpg'
 const Avalanche = '/images/networks/avalanche-network.jpg'

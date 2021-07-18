@@ -1,4 +1,4 @@
-import { ChainId, Currency, NATIVE, Token, WNATIVE } from '@sushiswap/sdk'
+import { ChainId, Currency, NATIVE, Token, WNATIVE } from 'dotoracle-sdk'
 import React, { createContext, useCallback, useContext, useEffect, useReducer } from 'react'
 import { ZERO, e10, maximum, minimum } from '../../functions/math'
 import {

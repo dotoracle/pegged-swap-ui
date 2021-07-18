@@ -1,4 +1,4 @@
-import { ChainId, CurrencyAmount, JSBI, MASTERCHEF_ADDRESS } from '@sushiswap/sdk'
+import { ChainId, CurrencyAmount, JSBI, MASTERCHEF_ADDRESS } from 'dotoracle-sdk'
 import { Chef, PairType } from './enum'
 import { MASTERCHEF_V2_ADDRESS, MINICHEF_ADDRESS, SUSHI } from '../../constants'
 import { NEVER_RELOAD, useSingleCallResult, useSingleContractMultipleData } from '../../state/multicall/hooks'

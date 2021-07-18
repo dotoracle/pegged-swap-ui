@@ -14,7 +14,7 @@ import {
   TIMELOCK_ADDRESS,
   WETH9,
   WNATIVE,
-} from '@sushiswap/sdk'
+} from 'dotoracle-sdk'
 import {
   BENTOBOX_ADDRESS,
   BORING_HELPER_ADDRESS,

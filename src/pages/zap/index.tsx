@@ -2,7 +2,7 @@ import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallbac
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import Button, { ButtonError } from '../../components/Button'
-import { ChainId, Currency, Ether, JSBI, NATIVE, Percent, ROUTER_ADDRESS, Trade, WNATIVE } from '@sushiswap/sdk'
+import { ChainId, Currency, Ether, JSBI, NATIVE, Percent, ROUTER_ADDRESS, Trade, WNATIVE } from 'dotoracle-sdk'
 import Column, { AutoColumn } from '../../components/Column'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { computeRealizedLPFeePercent, warningSeverity } from '../../functions/prices'

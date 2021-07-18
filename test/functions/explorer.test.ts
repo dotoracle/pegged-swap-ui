@@ -1,4 +1,4 @@
-import { ChainId } from '@sushiswap/sdk'
+import { ChainId } from 'dotoracle-sdk'
 import { getExplorerLink } from '../../src/functions/explorer'
 
 describe('utils', () => {

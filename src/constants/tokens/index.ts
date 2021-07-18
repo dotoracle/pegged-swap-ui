@@ -1,4 +1,4 @@
-import { ChainId, Ether, SUSHI_ADDRESS, Token, WETH9, WNATIVE } from '@sushiswap/sdk'
+import { ChainId, Ether, SUSHI_ADDRESS, Token, WETH9, WNATIVE } from 'dotoracle-sdk'
 
 import { SupportedChainId } from '../chains'
 

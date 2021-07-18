@@ -56,7 +56,6 @@
     "@sushiswap/chainlink-whitelist": "0.2.2",
     "@sushiswap/core": "2.0.0-canary.0",
     "@sushiswap/default-token-list": "7.5.0",
-    "@sushiswap/sdk": "5.0.0-canary.23",
     "@sushiswap/sushi-data": "^1.0.24",
     "@tailwindcss/jit": "^0.1.18",
     "@transak/transak-sdk": "^1.0.28",
@@ -139,6 +138,7 @@
     ]
   },
   "dependencies": {
+    "dotoracle-sdk": "^0.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-prettier-react": "^0.0.24",
     "eslint-plugin-prettier": "^3.4.0"

@@ -1,4 +1,4 @@
-import { Currency, NATIVE, WNATIVE } from '@sushiswap/sdk'
+import { Currency, NATIVE, WNATIVE } from 'dotoracle-sdk'
 import { ExtendedEther, WETH9_EXTENDED } from '../../constants/tokens'
 
 import { supportedChainId } from '../chain'
