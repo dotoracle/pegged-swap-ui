@@ -1,11 +1,13 @@
 import { Currency, CurrencyAmount, FACTORY_ADDRESS, Pair, computePairAddress } from 'dotoracle-sdk'
 
-import IUniswapV2PairABI from '@sushiswap/core/abi/IUniswapV2Pair.json'
+// import IUniswapV2PairABI from '@sushiswap/core/abi/IUniswapV2Pair.json'
+import IDTOPeggedSwapPairABI from '../constants/abis/IDTOPeggedSwapPair.json'
 import { Interface } from '@ethersproject/abi'
 import { useMemo } from 'react'
 import { useMultipleContractSingleData } from '../state/multicall/hooks'
 
-const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
+// const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
+const PAIR_INTERFACE = new Interface(IDTOPeggedSwapPairABI)
 
 export enum PairState {
   LOADING,
@@ -39,6 +41,7 @@ export function useV2Pairs(currencies: [Currency | undefined, Currency | undefin
   )
 
   const results = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'getReserves')
+  console.log('results', results)
 
   return useMemo(() => {
     return results.map((result, i) => {
