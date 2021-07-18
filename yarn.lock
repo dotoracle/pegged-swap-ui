@@ -5991,10 +5991,10 @@ dotignore@~0.1.2:
   dependencies:
     minimatch "^3.0.4"
 
-dotoracle-sdk@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/dotoracle-sdk/-/dotoracle-sdk-0.0.1.tgz#a8acfbd6fdac6fb677404eab577097065523d347"
-  integrity sha512-ITsXwrFbnCMbSZit20DAiid8d8P4mSA0kJeVclMCdJeZti/6LbQDf4/oKtQOHSF5dM94yWuCBhLei6aQqlOYzA==
+dotoracle-sdk@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/dotoracle-sdk/-/dotoracle-sdk-0.0.3.tgz#a0e427b8e8be62cf010dc669273c6b336dfafdf8"
+  integrity sha512-1ZL+EhGtuGsgI6yNS/G5HlwikcSoIcSFoBP8nXvLrRjf+q6/bavy7WwFEFW33P5ylzq0J+5nJ5dpI+qeST2loQ==
   dependencies:
     big.js "^5.2.2"
     decimal.js-light "^2.5.0"
