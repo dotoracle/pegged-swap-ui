@@ -307,7 +307,8 @@ export default function Add() {
       onFieldBInput('')
     }
     setTxHash('')
-  }, [onFieldAInput, onFieldBInput, txHash])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txHash])
 
   const addIsUnsupported = useIsSwapUnsupported(currencies?.CURRENCY_A, currencies?.CURRENCY_B)
 
