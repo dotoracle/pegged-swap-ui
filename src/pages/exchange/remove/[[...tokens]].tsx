@@ -64,8 +64,6 @@ export default function Remove() {
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
 
-  const { price } = useDerivedMintInfo(currencyA ?? undefined, currencyB ?? undefined)
-
   // burn state
   const { independentField, typedValue } = useBurnState()
   const { pair, parsedAmounts, error } = useDerivedBurnInfo(currencyA ?? undefined, currencyB ?? undefined)
