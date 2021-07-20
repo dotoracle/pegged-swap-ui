@@ -56,6 +56,7 @@ export function useMintActionHandlers(noLiquidity: boolean | undefined): {
 }
 
 export function useDerivedMintInfo(
+  formattedAmounts: { [Field.CURRENCY_A]: string; [Field.CURRENCY_B]: string },
   currencyA: Currency | undefined,
   currencyB: Currency | undefined
 ): {
@@ -141,15 +142,14 @@ export function useDerivedMintInfo(
       return undefined
     }
   }, [noLiquidity, otherTypedValue, currencies, dependentField, independentAmount, currencyA, currencyB, pair])
-
   const parsedAmounts: {
     [field in Field]: CurrencyAmount<Currency> | undefined
   } = useMemo(() => {
     return {
-      [Field.CURRENCY_A]: independentField === Field.CURRENCY_A ? independentAmount : dependentAmount,
-      [Field.CURRENCY_B]: independentField === Field.CURRENCY_A ? dependentAmount : independentAmount,
+      [Field.CURRENCY_A]: tryParseAmount(formattedAmounts[Field.CURRENCY_A], currencyA),
+      [Field.CURRENCY_B]: tryParseAmount(formattedAmounts[Field.CURRENCY_B], currencyB),
     }
-  }, [dependentAmount, independentAmount, independentField])
+  }, [currencyA, currencyB, formattedAmounts])
 
   const price = useMemo(() => {
     if (noLiquidity) {

@@ -67,6 +67,25 @@ export default function Add() {
 
   const [isExpertMode] = useExpertModeManager()
 
+  const [formattedAmounts, setFormattedAmounts] = useState({
+    [Field.CURRENCY_A]: '0',
+    [Field.CURRENCY_B]: '0',
+  })
+
+  const onFieldAInput = (value) => {
+    setFormattedAmounts({
+      ...formattedAmounts,
+      [Field.CURRENCY_A]: value,
+    })
+  }
+
+  const onFieldBInput = (value) => {
+    setFormattedAmounts({
+      ...formattedAmounts,
+      [Field.CURRENCY_B]: value,
+    })
+  }
+
   // mint state
   const { independentField, typedValue, otherTypedValue } = useMintState()
   const {
@@ -81,9 +100,7 @@ export default function Add() {
     liquidityMinted,
     poolTokenPercentage,
     error,
-  } = useDerivedMintInfo(currencyA ?? undefined, currencyB ?? undefined)
-
-  const { onFieldAInput, onFieldBInput } = useMintActionHandlers(noLiquidity)
+  } = useDerivedMintInfo(formattedAmounts, currencyA ?? undefined, currencyB ?? undefined)
 
   const isValid = !error
 
@@ -94,17 +111,9 @@ export default function Add() {
   // txn values
   const deadline = useTransactionDeadline() // custom from users settings
 
-  // const [allowedSlippage] = useUserSlippageTolerance(); // custom from users
-
   const allowedSlippage = useUserSlippageToleranceWithDefault(DEFAULT_ADD_V2_SLIPPAGE_TOLERANCE) // custom from users
 
   const [txHash, setTxHash] = useState<string>('')
-
-  // get formatted amounts
-  const formattedAmounts = {
-    [independentField]: typedValue,
-    [dependentField]: noLiquidity ? otherTypedValue : parsedAmounts[dependentField]?.toSignificant(6) ?? '',
-  }
 
   // get the max amounts user can add
   const maxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = [Field.CURRENCY_A, Field.CURRENCY_B].reduce(
@@ -159,8 +168,6 @@ export default function Add() {
       args = [
         (tokenBIsETH ? currencyA : currencyB)?.wrapped?.address ?? '', // token
         (tokenBIsETH ? parsedAmountA : parsedAmountB).quotient.toString(), // token desired
-        amountsMin[tokenBIsETH ? Field.CURRENCY_A : Field.CURRENCY_B].toString(), // token min
-        amountsMin[tokenBIsETH ? Field.CURRENCY_B : Field.CURRENCY_A].toString(), // eth min
         account,
         deadline.toHexString(),
       ]
@@ -173,8 +180,6 @@ export default function Add() {
         currencyB?.wrapped?.address ?? '',
         parsedAmountA.quotient.toString(),
         parsedAmountB.quotient.toString(),
-        amountsMin[Field.CURRENCY_A].toString(),
-        amountsMin[Field.CURRENCY_B].toString(),
         account,
         deadline.toHexString(),
       ]
@@ -299,16 +304,13 @@ export default function Add() {
     // if there was a tx hash, we want to clear the input
     if (txHash) {
       onFieldAInput('')
+      onFieldBInput('')
     }
     setTxHash('')
-  }, [onFieldAInput, txHash])
+  }, [onFieldAInput, onFieldBInput, txHash])
 
   const addIsUnsupported = useIsSwapUnsupported(currencies?.CURRENCY_A, currencies?.CURRENCY_B)
 
-  // console.log(
-  //   { addIsUnsupported, isValid, approvalA, approvalB },
-  //   approvalA === ApprovalState.APPROVED && approvalB === ApprovalState.APPROVED
-  // )
   return (
     <>
       <Head>
@@ -401,7 +403,7 @@ export default function Add() {
             <div>
               <CurrencyInputPanel
                 value={formattedAmounts[Field.CURRENCY_A]}
-                onUserInput={onFieldAInput}
+                onUserInput={(value) => onFieldAInput(value)}
                 onMax={() => {
                   onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
                 }}
@@ -424,7 +426,7 @@ export default function Add() {
 
               <CurrencyInputPanel
                 value={formattedAmounts[Field.CURRENCY_B]}
-                onUserInput={onFieldBInput}
+                onUserInput={(value) => onFieldBInput(value)}
                 onCurrencySelect={handleCurrencyBSelect}
                 onMax={() => {
                   onFieldBInput(maxAmounts[Field.CURRENCY_B]?.toExact() ?? '')

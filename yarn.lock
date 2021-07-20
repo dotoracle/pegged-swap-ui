@@ -5991,10 +5991,10 @@ dotoracle-default-token-list@^0.0.2:
   resolved "https://registry.yarnpkg.com/dotoracle-default-token-list/-/dotoracle-default-token-list-0.0.2.tgz#77c8083672bca46cfa91b46dc409a59c46007e34"
   integrity sha512-Tqlm3CTuLZlkn26HmboliKG0Xbr4kpv03972tqMFfo+mWGXYeJ/p6g52gaH18UeH8sRYs7tGRj67ymq66l4d7Q==
 
-dotoracle-sdk@0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/dotoracle-sdk/-/dotoracle-sdk-0.0.6.tgz#6861e15c556a21960391a1493c62239ba637c8b0"
-  integrity sha512-puEjt1KHZ/pVE0Lq1GZe/pPnKvAOfpBMxzLEXZ1uCtvuY94u2yDDXRA4o0E8kHDbaIQnhnLHSZDD1emAYbceaw==
+dotoracle-sdk@0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/dotoracle-sdk/-/dotoracle-sdk-0.0.9.tgz#0a2170b7835cf54e61b098aa3df5a142e24c88ec"
+  integrity sha512-7RoU7I0SoGstSMNiTQ8eDiHZIyyx+v6kP36GhQD3+n2FLlZl0/ClNMPpqSMrZoKpag9nuq/1hgm7LtzIpthHPg==
   dependencies:
     big.js "^5.2.2"
     decimal.js-light "^2.5.0"
