@@ -73,7 +73,7 @@ export function MinimalPositionCard({ pair, showUnwrapped = false, border }: Pos
                 </div>
               </RowFixed>
               <RowFixed className="flex items-center mt-3 space-x-2 text-base md:mt-0">
-                <div>{userPoolBalance ? userPoolBalance.toSignificant(4) : '-'} </div>
+                <div>{userPoolBalance ? userPoolBalance.toSignificant(6) : '-'} </div>
                 <div className="text-secondary">Pool Tokens</div>
               </RowFixed>
             </div>
