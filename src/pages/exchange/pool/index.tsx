@@ -69,22 +69,6 @@ export default function Pool() {
 
   const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
 
-  // TODO: Replicate this!
-  // show liquidity even if its deposited in rewards contract
-  // const stakingInfo = useStakingInfo()
-  // const stakingInfosWithBalance = stakingInfo?.filter((pool) =>
-  //   JSBI.greaterThan(pool.stakedAmount.quotient, BIG_INT_ZERO)
-  // )
-  // const stakingPairs = useV2Pairs(stakingInfosWithBalance?.map((stakingInfo) => stakingInfo.tokens))
-
-  // // remove any pairs that also are included in pairs with stake in mining pool
-  // const v2PairsWithoutStakedAmount = allV2PairsWithLiquidity.filter((v2Pair) => {
-  //   return (
-  //     stakingPairs
-  //       ?.map((stakingPair) => stakingPair[1])
-  //       .filter((stakingPair) => stakingPair?.liquidityToken.address === v2Pair.liquidityToken.address).length === 0
-  //   )
-  // })
   const migrationSupported = chainId in MigrationSupported
   return (
     <>
@@ -124,13 +108,6 @@ export default function Pool() {
               </Empty>
             ) : allV2PairsWithLiquidity?.length > 0 ? (
               <>
-                {/* <div className="flex items-center justify-center">
-                  <ExternalLink
-                    href={"https://analytics.sushi.com/user/" + account}
-                  >
-                    Account analytics and accrued fees <span> ↗</span>
-                  </ExternalLink>
-                </div> */}
                 {allV2PairsWithLiquidity.map((v2Pair) => (
                   <FullPositionCard
                     key={v2Pair.liquidityToken.address}

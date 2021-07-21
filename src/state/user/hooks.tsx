@@ -277,9 +277,9 @@ export function useTrackedTokenPairs(): [Token, Token][] {
     if (!forChain) return []
 
     return Object.keys(forChain).map((pairId) => {
-      return [deserializeToken(forChain[pairId].token0), deserializeToken(forChain[pairId].token1)]
+      return [tokens[forChain[pairId].token0.address], tokens[forChain[pairId].token1.address]]
     })
-  }, [savedSerializedPairs, chainId])
+  }, [chainId, savedSerializedPairs, tokens])
 
   const combinedList = useMemo(
     () => userPairs.concat(generatedPairs).concat(pinnedPairs),
