@@ -290,6 +290,7 @@ export function useDerivedSwapInfo(doArcher = false): {
     if (doArcher && v2Trade && swapCalls && !userTipManualOverride) {
       estimateGas()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doArcher, v2Trade, swapCalls, userTipManualOverride, library, setUserGasEstimate])
 
   return {

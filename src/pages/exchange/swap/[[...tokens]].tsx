@@ -1,12 +1,11 @@
 import { ARCHER_RELAY_URI, ARCHER_ROUTER_ADDRESS, INITIAL_ALLOWED_SLIPPAGE } from '../../../constants'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../../hooks/useApproveCallback'
-import { ArrowWrapper, BottomGrouping, SwapCallbackError } from '../../../features/swap/styleds'
+import { BottomGrouping, SwapCallbackError } from '../../../features/swap/styleds'
 import { AutoRow, RowBetween, RowFixed } from '../../../components/Row'
 import { ButtonConfirmed, ButtonError } from '../../../components/Button'
 import { ChainId, Currency, CurrencyAmount, JSBI, Token, TradeType, Trade as V2Trade } from 'dotoracle-sdk'
 import Column, { AutoColumn } from '../../../components/Column'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { UseERC20PermitState, useERC20PermitFromTrade } from '../../../hooks/useERC20Permit'
 import { useAllTokens, useCurrency } from '../../../hooks/Tokens'
 import {
   useDefaultsFromURLSearch,
@@ -20,7 +19,6 @@ import {
   useUserArcherGasPrice,
   useUserArcherUseRelay,
   useUserSingleHopOnly,
-  useUserSlippageTolerance,
   useUserTransactionTTL,
 } from '../../../state/user/hooks'
 import { useNetworkModalToggle, useToggleSettingsMenu, useWalletModalToggle } from '../../../state/application/hooks'
@@ -92,16 +90,8 @@ export default function Swap() {
 
   const { account, chainId } = useActiveWeb3React()
 
-  const toggleNetworkModal = useNetworkModalToggle()
-
-  const router = useRouter()
-
-  // toggle wallet when disconnected
-  const toggleWalletModal = useWalletModalToggle()
-
   // for expert mode
   const [isExpertMode] = useExpertModeManager()
-  const toggleSettings = useToggleSettingsMenu()
 
   // get custom setting values for user
   const [ttl] = useUserTransactionTTL()
@@ -172,12 +162,6 @@ export default function Swap() {
     [onUserInput]
   )
 
-  // reset if they close warning without tokens in params
-  const handleDismissTokenWarning = useCallback(() => {
-    setDismissTokenWarning(true)
-    router.push('/swap/')
-  }, [router])
-
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
@@ -211,28 +195,9 @@ export default function Swap() {
 
   const signatureData = undefined
 
-  // const {
-  //   state: signatureState,
-  //   signatureData,
-  //   gatherPermitSignature,
-  // } = useERC20PermitFromTrade(trade, allowedSlippage)
-
   const handleApprove = useCallback(async () => {
     await approveCallback()
-    // if (signatureState === UseERC20PermitState.NOT_SIGNED && gatherPermitSignature) {
-    //   try {
-    //     await gatherPermitSignature()
-    //   } catch (error) {
-    //     // try to approve if gatherPermitSignature failed for any reason other than the user rejecting it
-    //     if (error?.code !== 4001) {
-    //       await approveCallback()
-    //     }
-    //   }
-    // } else {
-    //   await approveCallback()
-    // }
   }, [approveCallback])
-  // }, [approveCallback, gatherPermitSignature, signatureState])
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
@@ -328,7 +293,6 @@ export default function Swap() {
   const [showInverted, setShowInverted] = useState<boolean>(false)
 
   // warnings on slippage
-  // const priceImpactSeverity = warningSeverity(priceImpactWithoutFee);
   const priceImpactSeverity = useMemo(() => {
     const executionPriceImpact = trade?.priceImpact
     return warningSeverity(
@@ -393,34 +357,9 @@ export default function Swap() {
     [onCurrencySelection]
   )
 
-  // useEffect(() => {
-  //   if (
-  //     doArcher &&
-  //     parsedAmounts[Field.INPUT] &&
-  //     maxAmountInput &&
-  //     parsedAmounts[Field.INPUT]?.greaterThan(maxAmountInput)
-  //   ) {
-  //     handleMaxInput();
-  //   }
-  // }, [handleMaxInput, parsedAmounts, maxAmountInput, doArcher]);
-
   const swapIsUnsupported = useIsSwapUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
-  const priceImpactTooHigh = priceImpactSeverity > 3 && !isExpertMode
-
   const [animateSwapArrows, setAnimateSwapArrows] = useState<boolean>(false)
-
-  const previousChainId = usePrevious<ChainId>(chainId)
-
-  // useEffect(() => {
-  //   if (
-  //     previousChainId &&
-  //     previousChainId !== chainId &&
-  //     router.asPath.includes(Currency.getNativeCurrencySymbol(previousChainId))
-  //   ) {
-  //     router.push(`/swap/${Currency.getNativeCurrencySymbol(chainId)}`);
-  //   }
-  // }, [chainId, previousChainId, router]);
 
   return (
     <>

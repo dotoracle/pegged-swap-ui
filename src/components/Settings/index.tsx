@@ -1,10 +1,5 @@
 import React, { useRef, useState } from 'react'
-import {
-  useExpertModeManager,
-  useUserArcherUseRelay,
-  useUserSingleHopOnly,
-  useUserTransactionTTL,
-} from '../../state/user/hooks'
+import { useExpertModeManager, useUserArcherUseRelay } from '../../state/user/hooks'
 import { useModalOpen, useToggleSettingsMenu } from '../../state/application/hooks'
 
 import { ApplicationModal } from '../../state/application/actions'
@@ -31,14 +26,10 @@ export default function SettingsTab({ placeholderSlippage }: { placeholderSlippa
 
   const [expertMode, toggleExpertMode] = useExpertModeManager()
 
-  const [singleHopOnly, setSingleHopOnly] = useUserSingleHopOnly()
-
   // show confirmation view before turning on
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   useOnClickOutside(node, open ? toggle : undefined)
-
-  const [ttl, setTtl] = useUserTransactionTTL()
 
   const [userUseArcher, setUserUseArcher] = useUserArcherUseRelay()
 
@@ -100,19 +91,6 @@ export default function SettingsTab({ placeholderSlippage }: { placeholderSlippa
                         setShowConfirmation(true)
                       }
                 }
-              />
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <Typography variant="sm" className="text-primary">
-                  {i18n._(t`Disable Multihops`)}
-                </Typography>
-                <QuestionHelper text={i18n._(t`Restricts swaps to direct pairs only.`)} />
-              </div>
-              <Toggle
-                id="toggle-disable-multihop-button"
-                isActive={singleHopOnly}
-                toggle={() => (singleHopOnly ? setSingleHopOnly(false) : setSingleHopOnly(true))}
               />
             </div>
             {chainId == ChainId.MAINNET && (
