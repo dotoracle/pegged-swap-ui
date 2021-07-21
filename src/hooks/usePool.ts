@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import IUniswapV2PairABI from '@sushiswap/core/abi/IUniswapV2Pair.json'
+import DTOPeggedSwapPairABI from '../constants/abis/DTOPeggedSwapPair.json'
 import { useContract } from './useContract'
 import { isAddress } from '../functions'
 import { BigNumber } from '@ethersproject/bignumber'
@@ -7,7 +7,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 const usePool = (poolAddress: string | undefined) => {
   const [poolData, setPoolData] = useState<any>({})
   const address = isAddress(poolAddress)
-  const poolContract = useContract(address || undefined, IUniswapV2PairABI, false)
+  const poolContract = useContract(address || undefined, DTOPeggedSwapPairABI, false)
 
   const fetchPoolData = useCallback(async () => {
     const [reserves, token0, token1, totalSupply] = await Promise.all([

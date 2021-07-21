@@ -227,7 +227,7 @@ export function useERC20Permit(
           primaryType: 'Permit',
           message,
         })
-
+        console.log('data', JSON.parse(data))
         return library
           .send('eth_signTypedData_v4', [account, data])
           .then(splitSignature)
@@ -268,7 +268,7 @@ export function useERC20Permit(
 
 const REMOVE_V2_LIQUIDITY_PERMIT_INFO: PermitInfo = {
   version: '1',
-  name: 'SushiSwap LP Token',
+  name: 'DotOracle LP Token',
   type: PermitType.AMOUNT,
 }
 

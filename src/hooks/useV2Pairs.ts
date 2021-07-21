@@ -1,13 +1,11 @@
 import { Currency, CurrencyAmount, FACTORY_ADDRESS, Pair, computePairAddress } from 'dotoracle-sdk'
 
-// import IUniswapV2PairABI from '@sushiswap/core/abi/IUniswapV2Pair.json'
-import IDTOPeggedSwapPairABI from '../constants/abis/IDTOPeggedSwapPair.json'
+import DTOPeggedSwapPairABI from '../constants/abis/DTOPeggedSwapPair.json'
 import { Interface } from '@ethersproject/abi'
 import { useMemo } from 'react'
 import { useMultipleContractSingleData } from '../state/multicall/hooks'
 
-// const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
-const PAIR_INTERFACE = new Interface(IDTOPeggedSwapPairABI)
+const PAIR_INTERFACE = new Interface(DTOPeggedSwapPairABI)
 
 export enum PairState {
   LOADING,

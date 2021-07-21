@@ -50,8 +50,6 @@ import { useWalletModalToggle } from '../../../state/application/hooks'
 
 const DEFAULT_REMOVE_LIQUIDITY_SLIPPAGE_TOLERANCE = new Percent(5, 100)
 
-const REMOVE_TIPS = {}
-
 export default function Remove() {
   const { i18n } = useLingui()
   const router = useRouter()
@@ -94,8 +92,6 @@ export default function Remove() {
       independentField === Field.CURRENCY_B ? typedValue : parsedAmounts[Field.CURRENCY_B]?.toSignificant(6) ?? '',
   }
 
-  const atMaxAmount = parsedAmounts[Field.LIQUIDITY_PERCENT]?.equalTo(new Percent('1'))
-
   // pair contract
   const pairContract: Contract | null = usePairContract(pair?.liquidityToken?.address)
 
@@ -136,19 +132,6 @@ export default function Remove() {
     [_onUserInput]
   )
 
-  const onLiquidityInput = useCallback(
-    (typedValue: string): void => onUserInput(Field.LIQUIDITY, typedValue),
-    [onUserInput]
-  )
-  const onCurrencyAInput = useCallback(
-    (typedValue: string): void => onUserInput(Field.CURRENCY_A, typedValue),
-    [onUserInput]
-  )
-  const onCurrencyBInput = useCallback(
-    (typedValue: string): void => onUserInput(Field.CURRENCY_B, typedValue),
-    [onUserInput]
-  )
-
   // tx sending
   const addTransaction = useTransactionAdder()
 
@@ -157,11 +140,6 @@ export default function Remove() {
     const { [Field.CURRENCY_A]: currencyAmountA, [Field.CURRENCY_B]: currencyAmountB } = parsedAmounts
     if (!currencyAmountA || !currencyAmountB) {
       throw new Error('missing currency amounts')
-    }
-
-    const amountsMin = {
-      [Field.CURRENCY_A]: calculateSlippageAmount(currencyAmountA, allowedSlippage)[0],
-      [Field.CURRENCY_B]: calculateSlippageAmount(currencyAmountB, allowedSlippage)[0],
     }
 
     if (!currencyA || !currencyB) throw new Error('missing tokens')
@@ -250,9 +228,7 @@ export default function Remove() {
       const safeGasEstimate = safeGasEstimates[indexOfSuccessfulEstimation]
 
       setAttemptingTxn(true)
-      await routerContract[methodName](...args, {
-        gasLimit: safeGasEstimate,
-      })
+      await routerContract[methodName](...args)
         .then((response: TransactionResponse) => {
           setAttemptingTxn(false)
 
