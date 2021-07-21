@@ -141,7 +141,6 @@ export function useERC20Permit(
   const tokenNonceState = useSingleCallResult(eip2612Contract, 'nonces', nonceInputs)
   const permitInfo =
     overridePermitInfo ?? (chainId && tokenAddress ? PERMITTABLE_TOKENS[chainId]?.[tokenAddress] : undefined)
-
   const [signatureData, setSignatureData] = useState<SignatureData | null>(null)
 
   return useMemo(() => {
@@ -268,7 +267,7 @@ export function useERC20Permit(
 
 const REMOVE_V2_LIQUIDITY_PERMIT_INFO: PermitInfo = {
   version: '1',
-  name: 'DotOracle LP Token',
+  name: 'DTOPeggedSwap',
   type: PermitType.AMOUNT,
 }
 
