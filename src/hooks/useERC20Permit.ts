@@ -226,7 +226,6 @@ export function useERC20Permit(
           primaryType: 'Permit',
           message,
         })
-        console.log('data', JSON.parse(data))
         return library
           .send('eth_signTypedData_v4', [account, data])
           .then(splitSignature)
