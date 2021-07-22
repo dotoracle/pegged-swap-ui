@@ -4,7 +4,7 @@ export default function Dashboard() {
   return (
     <>
       <Head>
-        <title>Dashboard | Sushi</title>
+        <title>Dashboard | DTO Pegged Swap</title>
         <meta name="description" content="Sushi" />
       </Head>
     </>

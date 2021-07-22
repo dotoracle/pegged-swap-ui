@@ -21,8 +21,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* 
-    Transak sets html overflow to scroll when modal is closed, lets 
+  /*
+    Transak sets html overflow to scroll when modal is closed, lets
     ensure that it always reamins as the defualt which is visible.
   */
   overflow: visible !important;
@@ -61,22 +61,3 @@ input:focus {
   box-shadow: none;
   outline: none;
 }
-
-/* *::-webkit-scrollbar {
-  width: var(--scrollbar-width);
-}
-
-::-webkit-scrollbar-track-piece:start {
-  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAQAAAAD+Fb1AAAADklEQVR42mNkgAJG3AwAAH4ABWjFc8IAAAAASUVORK5CYII=) repeat-y !important;
-}
-
-::-webkit-scrollbar-track-piece:end {
-  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAQAAAAD+Fb1AAAADklEQVR42mNkgAJG3AwAAH4ABWjFc8IAAAAASUVORK5CYII=) repeat-y !important;
-}
-
-*::-webkit-scrollbar-thumb {
-  border: 3px solid rgba(0, 0, 0, 0);
-  background-clip: padding-box;
-  border-radius: 9999px;
-  background-color: #BFBFBF;
-} */

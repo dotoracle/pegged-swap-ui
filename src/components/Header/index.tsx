@@ -1,8 +1,7 @@
-import { ChainId, Currency, NATIVE, SUSHI_ADDRESS } from 'dotoracle-sdk'
-import React, { useEffect, useState } from 'react'
+import { ChainId, NATIVE, SUSHI_ADDRESS } from 'dotoracle-sdk'
+import React from 'react'
 
 import { ANALYTICS_URL } from '../../constants'
-import Buy from '../../features/ramp'
 import ExternalLink from '../ExternalLink'
 import Image from 'next/image'
 import LanguageSwitch from '../LanguageSwitch'
@@ -18,9 +17,6 @@ import { useActiveWeb3React } from '../../hooks/useActiveWeb3React'
 import { useETHBalances } from '../../state/wallet/hooks'
 import { useLingui } from '@lingui/react'
 
-// import { ExternalLink, NavLink } from "./Link";
-// import { ReactComponent as Burger } from "../assets/images/burger.svg";
-
 function AppBar(): JSX.Element {
   const { i18n } = useLingui()
   const { account, chainId, library } = useActiveWeb3React()
@@ -28,7 +24,6 @@ function AppBar(): JSX.Element {
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
 
   return (
-    //     // <header className="flex flex-row justify-between w-screen flex-nowrap">
     <header className="flex-shrink-0 w-full">
       <Popover as="nav" className="z-10 w-full bg-transparent header-border-b">
         {({ open }) => (
@@ -39,7 +34,6 @@ function AppBar(): JSX.Element {
                   <Image src="/logo.png" alt="Sushi" width="32px" height="32px" />
                   <div className="hidden sm:block sm:ml-4">
                     <div className="flex space-x-2">
-                      {/* <Buy /> */}
                       <NavLink href="/swap">
                         <a
                           id={`swap-nav-link`}

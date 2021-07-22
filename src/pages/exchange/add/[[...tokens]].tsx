@@ -316,11 +316,7 @@ export default function Add() {
     <>
       <Head>
         <title>Add Liquidity | Sushi</title>
-        <meta
-          key="description"
-          name="description"
-          content="Add liquidity to the SushiSwap AMM to enable gas optimised and low slippage trades across countless networks"
-        />
+        <meta key="description" name="description" content="Add liquidity to the DTO Pegged Swap" />
       </Head>
 
       <Container id="remove-liquidity-page" maxWidth="2xl" className="space-y-6">
@@ -339,17 +335,6 @@ export default function Add() {
               </svg>
             </a>
           </NavLink>
-          {/* <button
-            style={{
-              backgroundColor: 'rgba(167, 85, 221, 0.25)',
-              border: '1px solid #A755DD',
-              borderRadius: 20,
-              padding: '5px 40px',
-              fontSize: 14,
-            }}
-          >
-            FARM THE {currencies[Field.CURRENCY_A]?.symbol}-{currencies[Field.CURRENCY_B]?.symbol} POOL
-          </button> */}
         </div>
 
         <Alert
@@ -373,8 +358,6 @@ export default function Add() {
         />
 
         <div className="p-4 space-y-4 rounded bg-dark-900 shadow-liquidity" style={{ zIndex: 1 }}>
-          {/* <AddRemoveTabs creating={isCreate} adding={true} defaultSlippage={DEFAULT_ADD_V2_SLIPPAGE_TOLERANCE} /> */}
-
           <ExchangeHeader
             input={currencies[Field.CURRENCY_A]}
             output={currencies[Field.CURRENCY_B]}
