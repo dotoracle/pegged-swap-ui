@@ -37,7 +37,6 @@
     "@ethersproject/bignumber": "^5.4.0",
     "@ethersproject/contracts": "^5.4.0",
     "@ethersproject/providers": "^5.4.1",
-    "@fontsource/dm-sans": "^4.4.5",
     "@gnosis.pm/safe-apps-web3-react": "^0.6.0",
     "@headlessui/react": "^1.3.0",
     "@heroicons/react": "^1.0.1",
@@ -141,6 +140,7 @@
     ]
   },
   "dependencies": {
+    "@fontsource/montserrat": "^4.5.0",
     "dotoracle-default-token-list": "^0.0.2"
   }
 }

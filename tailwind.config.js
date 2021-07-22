@@ -65,7 +65,7 @@ module.exports = {
         '48px': '48px',
       },
       fontFamily: {
-        sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
+        sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
       },
       fontSize: {
         hero: [

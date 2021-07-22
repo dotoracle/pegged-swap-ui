@@ -1,6 +1,6 @@
 import '../bootstrap'
 import '../styles/index.css'
-import '@fontsource/dm-sans/index.css'
+import '@fontsource/montserrat/index.css'
 import 'react-virtualized/styles.css'
 import 'react-tabs/style/react-tabs.css'
 
@@ -120,7 +120,7 @@ function MyApp({
           content="Real-time decentralized Oracle and Cross-chain liquidity network for Polkadot Ecosystem"
         />
         <meta key="twitter:image" name="twitter:image" content="/logo192.png" />
-        <meta key="twitter:creator" name="twitter:creator" content="@DoTOracle" />
+        <meta key="twitter:creator" name="twitter:creator" content="@DotOracle" />
         <meta key="og:type" property="og:type" content="website" />
         <meta key="og:site_name" property="og:site_name" content="DTO Pegged Swap" />
         <meta key="og:url" property="og:url" content="https://swap.dotoracle.network" />

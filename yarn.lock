@@ -1621,10 +1621,10 @@
     "@ethersproject/properties" "^5.4.0"
     "@ethersproject/strings" "^5.4.0"
 
-"@fontsource/dm-sans@^4.4.5":
-  version "4.4.5"
-  resolved "https://registry.yarnpkg.com/@fontsource/dm-sans/-/dm-sans-4.4.5.tgz#d39b00f12cdcd72d403d5458c39ace8d8bdd60eb"
-  integrity sha512-GhRMo659+nxsHwhF1pWZD1G/9irQC0eWGCbfTpp3qTbN+JdcdhkXhYGgBVSk0jwpqjtidLkx/14wrQwJfVIsSQ==
+"@fontsource/montserrat@^4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/montserrat/-/montserrat-4.5.0.tgz#8390d428c5eb440e78e33e13ff667ea4e0e27fb4"
+  integrity sha512-gbGuqmEf/hfwfzJzoeSMmCr+WKFmzs+fv1pm0aTM6iiMWhXJSmwfKzfWZL4c5a+PlCD/poySzXxu5yz0yjJ82A==
 
 "@fullhuman/postcss-purgecss@^4.0.3":
   version "4.0.3"
