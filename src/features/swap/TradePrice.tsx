@@ -23,7 +23,7 @@ export default function TradePrice({ price, showInverted, setShowInverted, class
 
   const flipPrice = useCallback(() => setShowInverted(!showInverted), [setShowInverted, showInverted])
 
-  const text = `${'1 ' + labelInverted + ' = ' + formattedPrice ?? '-'} ${label}`
+  const text = `${'1 ' + labelInverted + ' = ' + formattedPrice ?? '-'} ${label} (fee 0.3%)`
 
   return (
     <div
