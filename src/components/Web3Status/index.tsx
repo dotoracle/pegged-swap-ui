@@ -1,9 +1,5 @@
 import React, { useMemo } from 'react'
-import { fortmatic, injected, portis, walletconnect, walletlink } from '../../connectors'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
-
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import Image from 'next/image'
 import Loader from '../Loader'
 import { NetworkContextName } from '../../constants'
 import { TransactionDetails } from '../../state/transactions/reducer'
@@ -16,17 +12,6 @@ import useENSName from '../../hooks/useENSName'
 import { useLingui } from '@lingui/react'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { useWeb3React } from '@web3-react/core'
-
-const IconWrapper = styled.div<{ size?: number }>`
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: center;
-  & > * {
-    height: ${({ size }) => (size ? size + 'px' : '32px')};
-    width: ${({ size }) => (size ? size + 'px' : '32px')};
-  }
-`
 
 // we want the latest one to come first, so return negative if a is after b
 function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
@@ -82,7 +67,7 @@ function Web3StatusInner() {
       </div>
     )
   } else {
-    return <Web3Connect color="pink" style={{ paddingTop: '6px', paddingBottom: '6px' }} />
+    return <Web3Connect color="pink" className="uppercase" style={{ paddingTop: '6px', paddingBottom: '6px' }} />
   }
 }
 

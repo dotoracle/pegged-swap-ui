@@ -1,5 +1,5 @@
 import { ChainId, JSBI, Percent } from 'dotoracle-sdk'
-import { binance, fortmatic, injected, portis, torus, walletconnect, walletlink } from '../connectors'
+import { injected } from '../connectors'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { BigNumber } from 'ethers'
@@ -44,36 +44,10 @@ export const ARCHER_GAS_URI: { [chainId in ChainId]?: string } = {
   [ChainId.MAINNET]: 'https://api.archerdao.io/v1/gas',
 }
 
-// export const COMMON_CONTRACT_NAMES: { [address: string]: string } = {
-//     // [UNI_ADDRESS]: 'UNI',
-//     [TIMELOCK_ADDRESS]: 'Timelock',
-// }
-
 // TODO: update weekly with new constant
 export const MERKLE_ROOT =
   //'https://raw.githubusercontent.com/sushiswap/sushi-vesting/master/merkle/week-13/merkle-10959148-11550728.json'
   'https://raw.githubusercontent.com/sushiswap/sushi-vesting/master/merkle/week-14/merkle-10959148-11596364.json'
-
-// /**
-//  * Some tokens can only be swapped via certain pairs, so we override the list of bases that are considered for these
-//  * tokens.
-//  */
-// export const CUSTOM_BASES: {
-//     [chainId in ChainId]?: { [tokenAddress: string]: Token[] }
-// } = {
-//     [ChainId.MAINNET]: {
-//         [AMPL.address]: [DAI, WETH[ChainId.MAINNET]],
-//         [DUCK.address]: [USDP, WETH[ChainId.MAINNET]],
-//         [BAB.address]: [BAC, WETH[ChainId.MAINNET]],
-//         [HBTC.address]: [CREAM, WETH[ChainId.MAINNET]],
-//         [FRAX.address]: [FXS, WETH[ChainId.MAINNET]],
-//         [IBETH.address]: [ALPHA, WETH[ChainId.MAINNET]],
-//         [PONT.address]: [PWING, WETH[ChainId.MAINNET]],
-//         [UMA_CALL.address]: [UMA, WETH[ChainId.MAINNET]],
-//         [PLAY.address]: [DOUGH, WETH[ChainId.MAINNET]],
-//         [XSUSHI_CALL.address]: [XSUSHI, WETH[ChainId.MAINNET]],
-//     },
-// }
 
 export interface WalletInfo {
   connector?: (() => Promise<AbstractConnector>) | AbstractConnector
@@ -104,84 +78,6 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     description: 'Easy-to-use browser extension.',
     href: null,
     color: '#E8831D',
-  },
-  WALLET_CONNECT: {
-    connector: walletconnect,
-    name: 'WalletConnect',
-    iconName: 'wallet-connect.svg',
-    description: 'Connect to Trust Wallet, Rainbow Wallet and more...',
-    href: null,
-    color: '#4196FC',
-    mobile: true,
-  },
-  LATTICE: {
-    connector: async () => {
-      const LatticeConnector = (await import('@web3-react/lattice-connector')).LatticeConnector
-      return new LatticeConnector({
-        chainId: 1,
-        url: RPC[ChainId.MAINNET],
-        appName: 'SushiSwap',
-      })
-    },
-    name: 'Lattice',
-    iconName: 'lattice.png',
-    description: 'Connect to GridPlus Wallet.',
-    href: null,
-    color: '#40a9ff',
-    mobile: true,
-  },
-  WALLET_LINK: {
-    connector: walletlink,
-    name: 'Coinbase Wallet',
-    iconName: 'coinbase.svg',
-    description: 'Use Coinbase Wallet app on mobile device',
-    href: null,
-    color: '#315CF5',
-  },
-  COINBASE_LINK: {
-    name: 'Open in Coinbase Wallet',
-    iconName: 'coinbase.svg',
-    description: 'Open in Coinbase Wallet app.',
-    href: 'https://go.cb-w.com',
-    color: '#315CF5',
-    mobile: true,
-    mobileOnly: true,
-  },
-  FORTMATIC: {
-    connector: fortmatic,
-    name: 'Fortmatic',
-    iconName: 'fortmatic.png',
-    description: 'Login using Fortmatic hosted wallet',
-    href: null,
-    color: '#6748FF',
-    mobile: true,
-  },
-  Portis: {
-    connector: portis,
-    name: 'Portis',
-    iconName: 'portis.png',
-    description: 'Login using Portis hosted wallet',
-    href: null,
-    color: '#4A6C9B',
-    mobile: true,
-  },
-  Torus: {
-    connector: torus,
-    name: 'Torus',
-    iconName: 'torus.png',
-    description: 'Login using Torus hosted wallet',
-    href: null,
-    color: '#315CF5',
-    mobile: true,
-  },
-  Binance: {
-    connector: binance,
-    name: 'Binance',
-    iconName: 'bsc.jpg',
-    description: 'Login using Binance hosted wallet',
-    href: null,
-    color: '#F0B90B',
-    mobile: true,
   },
 }
 

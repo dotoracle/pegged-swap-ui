@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { fortmatic, injected, portis } from '../../connectors'
+import { injected } from '../../connectors'
 import { useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -8,7 +8,6 @@ import AccountDetails from '../../components/AccountDetails'
 import { ApplicationModal } from '../../state/application/actions'
 import { ButtonError } from '../../components/Button'
 import ExternalLink from '../../components/ExternalLink'
-import Image from 'next/image'
 import Modal from '../../components/Modal'
 import ModalHeader from '../../components/ModalHeader'
 import { OVERLAY_READY } from '../../connectors/Fortmatic'
@@ -16,7 +15,6 @@ import Option from './Option'
 import PendingView from './PendingView'
 import ReactGA from 'react-ga'
 import { SUPPORTED_WALLETS } from '../../constants'
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import { XIcon } from '@heroicons/react/outline'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
@@ -151,11 +149,6 @@ export default function WalletModal({
     setPendingWallet(conn) // set wallet for pending view
     setWalletView(WALLET_VIEWS.PENDING)
 
-    // if the connector is walletconnect and the user has already tried to connect, manually reset the connector
-    if (conn instanceof WalletConnectConnector && conn.walletConnectProvider?.wc?.uri) {
-      conn.walletConnectProvider = undefined
-    }
-
     conn &&
       activate(conn, undefined, true).catch((error) => {
         if (error instanceof UnsupportedChainIdError) {
@@ -166,13 +159,6 @@ export default function WalletModal({
       })
   }
 
-  // close wallet modal if fortmatic modal is active
-  useEffect(() => {
-    fortmatic.on(OVERLAY_READY, () => {
-      toggleWalletModal()
-    })
-  }, [toggleWalletModal])
-
   // get wallets user can switch too, depending on device/browser
   function getOptions() {
     const isMetamask = window.ethereum && window.ethereum.isMetaMask
@@ -181,11 +167,6 @@ export default function WalletModal({
 
       // check for mobile options
       if (isMobile) {
-        // disable portis on mobile for now
-        if (option.connector === portis) {
-          return null
-        }
-
         if (!window.web3 && !window.ethereum && option.mobile) {
           return (
             <Option
@@ -313,14 +294,6 @@ export default function WalletModal({
             />
           ) : (
             <div className="flex flex-col space-y-5 overflow-y-auto">{getOptions()}</div>
-          )}
-          {walletView !== WALLET_VIEWS.PENDING && (
-            <div className="flex flex-col text-center">
-              <div className="text-secondary">{i18n._(t`New to Ethereum?`)}</div>
-              <ExternalLink href="https://ethereum.org/wallets/" color="blue">
-                {i18n._(t`Learn more about wallets`)}
-              </ExternalLink>
-            </div>
           )}
         </div>
       </div>
