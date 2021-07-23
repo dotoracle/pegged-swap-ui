@@ -44,7 +44,6 @@ const StyledDialogContent = styled(({ minHeight, maxHeight, maxWidth, mobile, is
     box-shadow: 0 4px 8px 0 ${() => transparentize(0.95, '#000')};
 
     width: 100vw;
-    border-radius: 10px;
     // overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
     overflow-y: auto;
     overflow-x: hidden;
@@ -66,7 +65,7 @@ const StyledDialogContent = styled(({ minHeight, maxHeight, maxWidth, mobile, is
       css`
         min-height: ${minHeight}vh;
       `}
-            
+
 
 
     @media (min-width: 640px) {
@@ -141,8 +140,8 @@ export default function Modal({
                 maxWidth={maxWidth}
                 mobile={isMobile}
               >
-                <div className="w-full p-px rounded bg-gradient-to-r from-blue to-pink">
-                  <div className={`flex flex-col h-full w-full bg-dark-900 rounded p-6 overflow-y-auto`}>
+                <div className="w-full p-px border border-dto-pink">
+                  <div className={`flex flex-col h-full w-full bg-dark-900 p-6 overflow-y-auto`}>
                     {/* prevents the automatic focusing of inputs on mobile by the reach dialog */}
                     {!initialFocusRef && isMobile ? <div tabIndex={1} /> : null}
                     {children}

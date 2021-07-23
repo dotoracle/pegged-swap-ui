@@ -34,7 +34,7 @@ export default function Option({
   const content = (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between w-full p-3 rounded cursor-pointer ${
+      className={`flex items-center justify-between w-full p-3 cursor-pointer ${
         !active ? 'bg-dark-800 hover:bg-dark-700' : 'bg-dark-1000'
       }`}
     >
@@ -52,5 +52,5 @@ export default function Option({
     return <a href={link}>{content}</a>
   }
 
-  return !active ? content : <div className="w-full p-px rounded bg-gradient-to-r from-blue to-pink">{content}</div>
+  return !active ? content : <div className="w-full p-px border border-dto-pink">{content}</div>
 }
