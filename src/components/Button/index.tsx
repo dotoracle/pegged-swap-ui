@@ -11,22 +11,22 @@ const SIZE = {
 
 const FILLED = {
   default: 'bg-transparent',
-  red: 'bg-red bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
-  blue: 'bg-blue bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
-  pink: 'bg-pink bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
-  gray: 'border rounded shadow-sm focus:ring-2 focus:ring-offset-2 bg-dark-700 bg-opacity-80 w-full text-primary border-dark-800 hover:bg-opacity-100 focus:ring-offset-dark-700 focus:ring-dark-800 disabled:bg-opacity-80',
-  green: 'bg-green bg-opacity-80 w-full rounded text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  red: 'bg-red bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  blue: 'bg-blue bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  pink: 'bg-dto-pink bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  gray: 'border rounded-sm shadow-sm focus:ring-2 focus:ring-offset-2 bg-dark-700 bg-opacity-80 w-full text-white border-dark-800 hover:bg-opacity-100 disabled:bg-opacity-80',
+  green: 'bg-green bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
   gradient:
     'w-full text-high-emphesis bg-gradient-to-r from-blue to-pink opacity-80 hover:opacity-100 disabled:bg-opacity-80',
 }
 
 const OUTLINED = {
   default: 'bg-transparent',
-  red: 'bg-red bg-opacity-20 outline-red rounded text-red hover:bg-opacity-40 disabled:bg-opacity-20',
-  blue: 'bg-blue bg-opacity-20 outline-blue rounded text-blue hover:bg-opacity-40 disabled:bg-opacity-20',
-  pink: 'bg-pink bg-opacity-20 outline-pink rounded text-pink hover:bg-opacity-40 disabled:bg-opacity-20',
-  gray: 'bg-dark-700 bg-opacity-20 outline-gray rounded text-gray hover:bg-opacity-40 disabled:bg-opacity-20',
-  green: 'bg-green bg-opacity-20 border border-green rounded text-green hover:bg-opacity-40 disabled:bg-opacity-20',
+  red: 'bg-red bg-opacity-20 outline-red rounded-sm text-red hover:bg-opacity-40 disabled:bg-opacity-20',
+  blue: 'bg-blue bg-opacity-20 outline-blue rounded-sm text-blue hover:bg-opacity-40 disabled:bg-opacity-20',
+  pink: 'bg-dto-pink bg-opacity-20 outline-pink rounded-sm text-pink hover:bg-opacity-40 disabled:bg-opacity-20',
+  gray: 'bg-dark-700 bg-opacity-20 outline-gray rounded-sm text-gray hover:bg-opacity-40 disabled:bg-opacity-20',
+  green: 'bg-green bg-opacity-20 border border-green rounded-sm text-green hover:bg-opacity-40 disabled:bg-opacity-20',
   gradient: 'bg-gradient-to-r from-blue to-pink opacity-80 hover:opacity-100 disabled:bg-opacity-20',
 }
 
@@ -36,7 +36,7 @@ const EMPTY = {
 }
 
 const LINK = {
-  default: 'text-primary hover:text-high-emphesis focus:text-high-emphesis whitespace-nowrap focus:ring-0',
+  default: 'text-white hover:text-high-emphesis focus:text-high-emphesis whitespace-nowrap focus:ring-0',
 }
 
 const VARIANT = {
@@ -73,8 +73,8 @@ function Button({
       className={classNames(
         VARIANT[variant][color],
         variant !== 'empty' && SIZE[size],
-        'rounded font-medium disabled:cursor-not-allowed focus:outline-none',
-        // 'rounded focus:outline-none focus:ring disabled:opacity-50 disabled:cursor-not-allowed font-medium',
+        'rounded-sm font-medium disabled:cursor-not-allowed focus:outline-none',
+        // 'rounded-sm focus:outline-none focus:ring disabled:opacity-50 disabled:cursor-not-allowed font-medium',
         className
       )}
       {...rest}

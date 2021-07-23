@@ -31,7 +31,7 @@ export default function Web3Connect({ color = 'gray', size = 'sm', className = '
     <Button
       id="connect-wallet"
       onClick={toggleWalletModal}
-      variant="outlined"
+      variant="filled"
       color={color}
       className={className}
       size={size}
