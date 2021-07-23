@@ -1,6 +1,8 @@
 import '../bootstrap'
 import '../styles/index.css'
-import '@fontsource/montserrat/index.css'
+import '@fontsource/montserrat/400.css'
+import '@fontsource/montserrat/500.css'
+import '@fontsource/montserrat/700.css'
 import 'react-virtualized/styles.css'
 import 'react-tabs/style/react-tabs.css'
 

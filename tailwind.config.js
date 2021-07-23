@@ -42,6 +42,7 @@ module.exports = {
         green: '#7cff6b',
         red: '#ff3838',
         yellow: '#ffd166',
+        white: '#ffffff',
 
         'pink-red': '#FE5A75',
         'light-brown': '#FEC464',
@@ -57,6 +58,8 @@ module.exports = {
         'dark-600': '#1C2D49',
         'dark-500': '#223D5E',
         'low-emphesis': '#575757',
+        'dto-header-bg': '#3b0899',
+        'dto-pink': '#e2007a',
         primary: '#BFBFBF',
         secondary: '#7F7F7F',
         'high-emphesis': '#E3E3E3',

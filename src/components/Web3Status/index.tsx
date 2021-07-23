@@ -33,54 +33,9 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
   return b.addedTime - a.addedTime
 }
 
-const SOCK = (
-  <span role="img" aria-label="has socks emoji" style={{ marginTop: -4, marginBottom: -4 }}>
-    🧦
-  </span>
-)
-
-// eslint-disable-next-line react/prop-types
-function StatusIcon({ connector }: { connector: AbstractConnector }) {
-  if (connector === injected) {
-    return <Image src="/chef.svg" alt="Injected (MetaMask etc...)" width={20} height={20} />
-    // return <Identicon />
-  } else if (connector === walletconnect) {
-    return (
-      <IconWrapper size={16}>
-        <Image src="/images/wallets/wallet-connect.png" alt={'Wallet Connect'} width="16px" height="16px" />
-      </IconWrapper>
-    )
-  } else if (connector.constructor.name === 'LatticeConnector') {
-    return (
-      <IconWrapper size={16}>
-        <Image src="/images/wallets/lattice.png" alt={'Lattice'} width="16px" height="16px" />
-      </IconWrapper>
-    )
-  } else if (connector === walletlink) {
-    return (
-      <IconWrapper size={16}>
-        <Image src="/images/wallets/coinbase.svg" alt={'Coinbase Wallet'} width="16px" height="16px" />
-      </IconWrapper>
-    )
-  } else if (connector === fortmatic) {
-    return (
-      <IconWrapper size={16}>
-        <Image src="/images/wallets/fortmatic.png" alt={'Fortmatic'} width="16px" height="16px" />
-      </IconWrapper>
-    )
-  } else if (connector === portis) {
-    return (
-      <IconWrapper size={16}>
-        <Image src="/images/wallets/portis.png" alt={'Portis'} width="16px" height="16px" />
-      </IconWrapper>
-    )
-  }
-  return null
-}
-
 function Web3StatusInner() {
   const { i18n } = useLingui()
-  const { account, connector } = useWeb3React()
+  const { account } = useWeb3React()
 
   const { ENSName } = useENSName(account ?? undefined)
 
@@ -111,7 +66,7 @@ function Web3StatusInner() {
     return (
       <div
         id="web3-status-connected"
-        className="flex items-center px-3 py-2 text-sm rounded-lg bg-dark-1000 text-secondary"
+        className="flex items-center px-3 py-2 text-sm rounded-sm text-white bg-dto-pink font-bold uppercase"
         onClick={toggleWalletModal}
       >
         {hasPendingTransactions ? (
@@ -124,7 +79,6 @@ function Web3StatusInner() {
         ) : (
           <div className="mr-2">{ENSName || shortenAddress(account)}</div>
         )}
-        {!hasPendingTransactions && connector && <StatusIcon connector={connector} />}
       </div>
     )
   } else {
