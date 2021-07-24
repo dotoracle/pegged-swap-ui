@@ -68,7 +68,7 @@ export function MinimalPositionCard({ pair, showUnwrapped = false, border }: Pos
             <div className="flex flex-col md:flex-row md:justify-between">
               <RowFixed className="flex items-center space-x-4">
                 <DoubleCurrencyLogo currency0={pair.token0} currency1={pair.token1} size={40} />
-                <div className="text-2xl font-semibold">
+                <div className="text-2xl text-white font-semibold">
                   {currency0.symbol}/{currency1.symbol}
                 </div>
               </RowFixed>
@@ -166,7 +166,7 @@ export default function FullPositionCard({ pair, border, stakedBalance }: Positi
       >
         <div className="flex items-center space-x-4">
           <DoubleCurrencyLogo currency0={currency0} currency1={currency1} size={40} />
-          <div className="text-xl font-semibold">
+          <div className="text-xl text-white font-semibold">
             {!currency0 || !currency1 ? <Dots>{i18n._(t`Loading`)}</Dots> : `${currency0.symbol}/${currency1.symbol}`}
           </div>
         </div>
