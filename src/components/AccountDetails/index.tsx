@@ -1,5 +1,5 @@
 import React, { FC, useCallback } from 'react'
-import { binance, fortmatic, injected, portis, torus, walletconnect, walletlink } from '../../connectors'
+import { injected } from '../../connectors'
 
 import { AppDispatch } from '../../state'
 import Button from '../Button'
