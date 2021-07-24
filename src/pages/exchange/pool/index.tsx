@@ -17,7 +17,6 @@ import FullPositionCard from '../../../components/PositionCard'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MigrationSupported } from '../../../features/migration'
 import Typography from '../../../components/Typography'
 import Web3Connect from '../../../components/Web3Connect'
 import { t } from '@lingui/macro'
@@ -69,7 +68,6 @@ export default function Pool() {
 
   const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
 
-  const migrationSupported = chainId in MigrationSupported
   return (
     <>
       <Head>
@@ -121,7 +119,7 @@ export default function Pool() {
                 <div className="px-4 py-2">{i18n._(t`No liquidity was found. `)}</div>
               </Empty>
             )}
-            <div className={classNames('grid gap-4', migrationSupported ? 'grid-cols-3' : 'grid-cols-2')}>
+            <div className={classNames('grid gap-4', 'grid-cols-2')}>
               <Button
                 id="add-pool-button"
                 color="pink"
@@ -133,12 +131,6 @@ export default function Pool() {
               <Button id="add-pool-button" color="gray" onClick={() => router.push(`/find`)}>
                 {i18n._(t`Import`)}
               </Button>
-
-              {migrationSupported && (
-                <Button id="create-pool-button" color="gray" onClick={() => router.push(`/migrate`)}>
-                  {i18n._(t`Migrate`)}
-                </Button>
-              )}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { fortmatic, injected, portis } from '../../connectors'
+import { injected } from '../../connectors'
 import { useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -8,12 +8,10 @@ import AccountDetails from '../../components/AccountDetails'
 import { ApplicationModal } from '../../state/application/actions'
 import ExternalLink from '../../components/ExternalLink'
 // import MetamaskIcon from '../../assets/images/metamask.png'
-import { OVERLAY_READY } from '../../connectors/Fortmatic'
 import Option from './Option'
 import PendingView from './PendingView'
 import ReactGA from 'react-ga'
 import { SUPPORTED_WALLETS } from '../../constants'
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 // import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { XIcon } from '@heroicons/react/outline'
 import { isMobile } from 'react-device-detect'
@@ -176,11 +174,6 @@ export default function WalletStandalone({
     setPendingWallet(conn) // set wallet for pending view
     setWalletView(WALLET_VIEWS.PENDING)
 
-    // if the connector is walletconnect and the user has already tried to connect, manually reset the connector
-    if (conn instanceof WalletConnectConnector && conn.walletConnectProvider?.wc?.uri) {
-      conn.walletConnectProvider = undefined
-    }
-
     conn &&
       activate(conn, undefined, true).catch((error) => {
         if (error instanceof UnsupportedChainIdError) {
@@ -191,13 +184,6 @@ export default function WalletStandalone({
       })
   }
 
-  // close wallet modal if fortmatic modal is active
-  useEffect(() => {
-    fortmatic.on(OVERLAY_READY, () => {
-      toggleWalletModal()
-    })
-  }, [toggleWalletModal])
-
   // get wallets user can switch too, depending on device/browser
   function getOptions() {
     const isMetamask = window.ethereum && window.ethereum.isMetaMask
@@ -206,11 +192,6 @@ export default function WalletStandalone({
 
       // check for mobile options
       if (isMobile) {
-        // disable portis on mobile for now
-        if (option.connector === portis) {
-          return null
-        }
-
         if (!window.web3 && !window.ethereum && option.mobile) {
           return (
             <Option
