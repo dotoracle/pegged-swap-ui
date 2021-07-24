@@ -47,12 +47,12 @@ export default function ExchangeHeader({
           </a>
         </NavLink>
         <NavLink
-          activeClassName="font-bold bg-transparent border rounded text-high-emphesis border-transparent md:border-gradient-r-blue-pink-dark-800"
+          activeClassName="font-bold bg-dto-pink hover:bg-dto-dark-pink rounded"
           href={`/${!isRemove ? 'add' : 'remove'}${input ? `/${currencyId(input)}` : ''}${
             output ? `/${currencyId(output)}` : ''
           }`}
         >
-          <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md md:px-10 text-secondary hover:text-high-emphesis">
+          <a className="flex items-center justify-center px-4 font-medium text-center rounded-md md:px-10 text-white">
             {i18n._(t`Liquidity`)}
           </a>
         </NavLink>

@@ -140,7 +140,7 @@ export default function Modal({
                 maxWidth={maxWidth}
                 mobile={isMobile}
               >
-                <div className="w-full p-px border border-dto-pink">
+                <div className="w-full p-px border border-dto-pink border-opacity-50">
                   <div className={`flex flex-col h-full w-full bg-dark-900 p-6 overflow-y-auto`}>
                     {/* prevents the automatic focusing of inputs on mobile by the reach dialog */}
                     {!initialFocusRef && isMobile ? <div tabIndex={1} /> : null}

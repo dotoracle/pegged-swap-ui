@@ -73,11 +73,11 @@ export default function Pool() {
   return (
     <>
       <Head>
-        <title>Pool | Sushi</title>
+        <title>Pool | DTO Pegged Swap</title>
         <meta
           key="description"
           name="description"
-          content="SushiSwap liquidity pools are markets for trades between the two tokens, you can provide these tokens and become a liquidity provider to earn 0.25% of fees from trades."
+          content="DTO Pegged Swap liquidity pools are markets for trades between the two tokens, you can provide these tokens and become a liquidity provider to earn fees from trades."
         />
       </Head>
 
@@ -90,13 +90,13 @@ export default function Pool() {
           </Typography>
         </div>
 
-        <Alert
+        {/* <Alert
           title={i18n._(t`Liquidity Provider Rewards`)}
           message={i18n._(t`Liquidity providers earn a 0.25% fee on all trades proportional to their share of
                         the pool. Fees are added to the pool, accrue in real time and can be claimed by
                         withdrawing your liquidity`)}
           type="information"
-        />
+        /> */}
 
         <div className="p-4 space-y-4 rounded bg-dark-900">
           <div className="grid grid-flow-row gap-3">
@@ -124,7 +124,7 @@ export default function Pool() {
             <div className={classNames('grid gap-4', migrationSupported ? 'grid-cols-3' : 'grid-cols-2')}>
               <Button
                 id="add-pool-button"
-                color="gradient"
+                color="pink"
                 className="grid items-center justify-center grid-flow-col gap-2 whitespace-nowrap"
                 onClick={() => router.push(`/add/${currencyId(NATIVE[chainId])}`)}
               >

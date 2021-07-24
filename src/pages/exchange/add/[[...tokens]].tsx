@@ -315,14 +315,14 @@ export default function Add() {
   return (
     <>
       <Head>
-        <title>Add Liquidity | Sushi</title>
+        <title>Add Liquidity | DTO Pegged Swap</title>
         <meta key="description" name="description" content="Add liquidity to the DTO Pegged Swap" />
       </Head>
 
       <Container id="remove-liquidity-page" maxWidth="2xl" className="space-y-6">
         <div className="flex items-center justify-between px-4 mb-5">
           <NavLink href="/pool">
-            <a className="flex items-center space-x-2 text-base font-medium text-center cursor-pointer text-secondary hover:text-high-emphesis">
+            <a className="flex items-center space-x-2 text-base font-medium text-center cursor-pointer text-white hover:text-high-emphesis">
               <span>{i18n._(t`View Liquidity Positions`)}</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -337,7 +337,7 @@ export default function Add() {
           </NavLink>
         </div>
 
-        <Alert
+        {/* <Alert
           message={
             noLiquidity ? (
               i18n._(
@@ -355,7 +355,7 @@ export default function Add() {
             )
           }
           type="information"
-        />
+        /> */}
 
         <div className="p-4 space-y-4 rounded bg-dark-900 shadow-liquidity" style={{ zIndex: 1 }}>
           <ExchangeHeader
