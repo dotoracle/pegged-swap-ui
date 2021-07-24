@@ -73,26 +73,6 @@ const AccountDetails: FC<AccountDetailsProps> = ({
     if (connector === injected) {
       return null
       // return <IconWrapper size={16}>{/* <Identicon /> */}</IconWrapper>
-    } else if (connector === walletconnect) {
-      return <WalletIcon src="/wallet-connect.png" alt="Wallet Connect" size={16} />
-    } else if (connector === walletlink) {
-      return <WalletIcon src="/coinbase.svg" alt="Coinbase" size={16} />
-    } else if (connector === fortmatic) {
-      return <WalletIcon src="/formatic.png" alt="Fortmatic" size={16} />
-    } else if (connector === portis) {
-      return (
-        <WalletIcon src="/portnis.png" alt="Portis" size={16}>
-          <Button
-            onClick={() => {
-              portis.portis.showPortis()
-            }}
-          >
-            Show Portis
-          </Button>
-        </WalletIcon>
-      )
-    } else if (connector === torus) {
-      return <WalletIcon src="/torus.png" alt="Torus" size={16} />
     }
     return null
   }
@@ -109,7 +89,7 @@ const AccountDetails: FC<AccountDetailsProps> = ({
           <div className="flex items-center justify-between">
             {formatConnectorName()}
             <div className="flex space-x-3">
-              {connector !== injected && connector !== walletlink && connector !== binance && (
+              {connector !== injected && (
                 <Button
                   variant="outlined"
                   color="gray"
