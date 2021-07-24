@@ -136,6 +136,8 @@
   "dependencies": {
     "@fontsource/montserrat": "^4.5.0",
     "dotoracle-default-token-list": "^0.0.2",
+    "multicodec": "^3.1.0",
+    "multihashes": "^4.0.2",
     "react-icons": "^4.2.0"
   }
 }
