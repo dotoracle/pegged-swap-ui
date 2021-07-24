@@ -144,19 +144,6 @@ export const BASE_SWAPPER: { [chainId in ChainId]?: string } = {
   [ChainId.ROPSTEN]: '0xe4E2540D421e56b0B786d40c5F5268891288c6fb',
 }
 
-// Boring Helper
-// export const BORING_HELPER_ADDRESS = '0x11Ca5375AdAfd6205E41131A4409f182677996E6'
-
-export const ANALYTICS_URL: { [chainId in ChainId]?: string } = {
-  [ChainId.MAINNET]: 'https://analytics.sushi.com',
-  [ChainId.MATIC]: 'https://analytics-polygon.sushi.com',
-  [ChainId.FANTOM]: 'https://analytics-ftm.sushi.com',
-  [ChainId.BSC]: 'https://analytics-bsc.sushi.com',
-  [ChainId.XDAI]: 'https://analytics-xdai.sushi.com',
-  [ChainId.HARMONY]: 'https://analytics-harmony.sushi.com',
-  [ChainId.ARBITRUM]: undefined,
-}
-
 export const EIP_1559_ACTIVATION_BLOCK: { [chainId in ChainId]?: number } = {
   [ChainId.ROPSTEN]: 10499401,
   [ChainId.GÖRLI]: 5062605,

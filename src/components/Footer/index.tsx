@@ -1,57 +1,66 @@
-import { ANALYTICS_URL } from '../../constants'
-import { ChainId } from 'dotoracle-sdk'
-import ExternalLink from '../ExternalLink'
-import Polling from '../Polling'
-import { t } from '@lingui/macro'
-import useActiveWeb3React from '../../hooks/useActiveWeb3React'
 import { useLingui } from '@lingui/react'
+import { FaTwitter, FaGithub, FaTelegramPlane } from 'react-icons/fa'
+import useActiveWeb3React from '../../hooks/useActiveWeb3React'
+import styled from 'styled-components'
+
+const SocialLinks = styled.ul`
+  @media (min-width: 768px) {
+    text-align: right;
+  }
+`
+const SocialItem = styled.li`
+  display: inline-block;
+  vertial-align: middle;
+  margin-right: 2rem;
+  @media (min-width: 768px) {
+    margin-right: 0;
+    margin-left: 2rem;
+  }
+  a {
+    color: #fff;
+    transition: 0.5s ease all;
+  }
+`
 
 const Footer = () => {
-  const { chainId } = useActiveWeb3React()
-  const { i18n } = useLingui()
   return (
-    // <footer className="absolute bottom-0 flex items-center justify-between w-screen h-20 p-4 mx-auto text-center text-low-emphesis">
-    <footer className="flex-shrink-0 w-full">
-      <div className="flex items-center justify-between h-20 px-4">
-        {chainId && chainId in ANALYTICS_URL && (
-          <ExternalLink
-            id={`analytics-nav-link`}
-            href={ANALYTICS_URL[chainId] || 'https://analytics.sushi.com'}
-            className="text-low-emphesis"
-          >
-            <div className="flex items-center space-x-2">
-              <div>{i18n._(t`Analytics`)}</div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    <footer className="flex-shrink-0 w-full bg-dto-footer-bg">
+      <div className="flex flex-col md:flex-row items-center justify-between max-w-screen-xl mx-auto p-4 md:h-20">
+        <p className="text-white mb-3 md:mb-0">Copyright © {new Date().getFullYear()} DotOracle</p>
+        <div>
+          <SocialLinks>
+            <SocialItem>
+              <a
+                href="https://t.me/dotoracle"
+                target="_blank"
+                rel="nofollow noreferrer noopener"
+                className="hover:text-dto-pink"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-          </ExternalLink>
-        )}
-        {chainId && chainId === ChainId.MATIC && (
-          <ExternalLink
-            id={`polygon-bridge-link`}
-            href="https://wallet.matic.network/bridge/"
-            className="text-low-emphesis"
-          >
-            {i18n._(t`Matic Bridge`)}
-          </ExternalLink>
-        )}
-        {chainId && chainId === ChainId.HARMONY && (
-          <ExternalLink
-            id={`harmony-bridge-link`}
-            href=" https://bridge.harmony.one/tokens"
-            className="text-low-emphesis"
-          >
-            {i18n._(t`Harmony Bridge`)}
-          </ExternalLink>
-        )}
-        <Polling />
+                <FaTelegramPlane size="1.5rem" />
+              </a>
+            </SocialItem>
+            <SocialItem>
+              <a
+                href="https://twitter.com/DotOracle"
+                target="_blank"
+                rel="nofollow noreferrer noopener"
+                className="hover:text-dto-pink"
+              >
+                <FaTwitter size="1.5rem" />
+              </a>
+            </SocialItem>
+            <SocialItem>
+              <a
+                href="https://github.com/dotoracle"
+                target="_blank"
+                rel="nofollow noreferrer noopener"
+                className="hover:text-dto-pink"
+              >
+                <FaGithub size="1.5rem" />
+              </a>
+            </SocialItem>
+          </SocialLinks>
+        </div>
       </div>
     </footer>
   )

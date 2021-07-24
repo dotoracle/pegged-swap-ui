@@ -1,7 +1,6 @@
 import { ChainId } from 'dotoracle-sdk'
 import React from 'react'
 
-import { ANALYTICS_URL } from '../../constants'
 import ExternalLink from '../ExternalLink'
 import Image from 'next/image'
 import Link from 'next/link'

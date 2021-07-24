@@ -59,6 +59,7 @@ module.exports = {
         'dark-500': '#223D5E',
         'low-emphesis': '#575757',
         'dto-header-bg': '#3b0899',
+        'dto-footer-bg': '#470fac',
         'dto-pink': '#e2007a',
         primary: '#BFBFBF',
         secondary: '#7F7F7F',
