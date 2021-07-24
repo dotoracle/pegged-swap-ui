@@ -36,13 +36,13 @@ export default function ExchangeHeader({
     <div className="flex justify-between mb-4 space-x-3">
       <div className="grid grid-cols-2 rounded-md p-3px md:bg-dark-800">
         <NavLink
-          activeClassName="font-bold bg-transparent border rounded text-high-emphesis border-transparent md:border-gradient-r-blue-pink-dark-800"
+          activeClassName="font-bold bg-dto-pink hover:bg-dto-dark-pink rounded"
           href={{
             pathname: '/swap',
             query: getQuery(input, output),
           }}
         >
-          <a className="flex items-center justify-center px-4 text-base font-medium text-center rounded-md md:px-10 text-secondary hover:text-high-emphesis">
+          <a className="flex items-center justify-center px-4 font-medium text-center rounded-md md:px-10 text-white">
             {i18n._(t`Swap`)}
           </a>
         </NavLink>

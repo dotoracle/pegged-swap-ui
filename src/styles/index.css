@@ -61,3 +61,9 @@ input:focus {
   box-shadow: none;
   outline: none;
 }
+
+main {
+  background-image: url(/page-bg.png);
+  background-size: cover;
+  background-attachment: fixed;
+}

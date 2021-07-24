@@ -13,7 +13,7 @@ const FILLED = {
   default: 'bg-transparent',
   red: 'bg-red bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
   blue: 'bg-blue bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
-  pink: 'bg-dto-pink bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
+  pink: 'bg-dto-pink w-full rounded-sm text-high-emphesis hover:bg-dto-dark-pink disabled:bg-opacity-80',
   gray: 'border rounded-sm shadow-sm focus:ring-2 focus:ring-offset-2 bg-dark-700 bg-opacity-80 w-full text-white border-dark-800 hover:bg-opacity-100 disabled:bg-opacity-80',
   green: 'bg-green bg-opacity-80 w-full rounded-sm text-high-emphesis hover:bg-opacity-100 disabled:bg-opacity-80',
   gradient:

@@ -368,7 +368,7 @@ export default function Swap() {
         <meta
           key="description"
           name="description"
-          content="SushiSwap allows for swapping of ERC20 compatible tokens across multiple networks"
+          content="DTO Pegged Swap allows for swapping of ERC20 compatible tokens across multiple networks"
         />
       </Head>
       <TokenWarningModal
@@ -376,11 +376,7 @@ export default function Swap() {
         tokens={importTokensNotInDefault}
         onConfirm={handleConfirmTokenWarning}
       />
-      <div
-        id="swap-page"
-        className="w-full max-w-2xl p-4 space-y-4 rounded bg-dark-900 shadow-swap"
-        style={{ zIndex: 1 }}
-      >
+      <div id="swap-page" className="w-full max-w-2xl p-4 space-y-4 rounded bg-dark-900" style={{ zIndex: 1 }}>
         <SwapHeader
           input={currencies[Field.INPUT]}
           output={currencies[Field.OUTPUT]}
