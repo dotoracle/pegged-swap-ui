@@ -358,7 +358,7 @@ export default function Swap() {
   return (
     <>
       <Head>
-        <title>DTO | Pegged Swap</title>
+        <title>Pegged Swap | DotOracle</title>
         <meta
           key="description"
           name="description"
