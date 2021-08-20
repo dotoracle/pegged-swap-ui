@@ -96,7 +96,7 @@ function MyApp({
           name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
         />
-        <title key="title">DotOracle | Pegged Swap</title>
+        <title key="title">Pegged Swap | DotOracle</title>
 
         <meta
           key="description"
@@ -104,29 +104,32 @@ function MyApp({
           content="Real-time decentralized Oracle and Cross-chain liquidity network for Polkadot Ecosystem"
         />
 
-        <meta name="application-name" content="DTO Pegged Swap" />
+        <meta name="application-name" content="Pegged Swap | DotOracle" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="DTO Pegged Swap" />
+        <meta name="apple-mobile-web-app-title" content="Pegged Swap | DotOracle" />
 
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#F338C3" />
 
-        <meta key="twitter:card" name="twitter:card" content="app" />
-        <meta key="twitter:title" name="twitter:title" content="DTO Pegged Swap" />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta key="twitter:title" name="twitter:title" content="Pegged Swap | DotOracle" />
         <meta key="twitter:url" name="twitter:url" content="https://swap.dotoracle.network" />
         <meta
           key="twitter:description"
           name="twitter:description"
           content="Real-time decentralized Oracle and Cross-chain liquidity network for Polkadot Ecosystem"
         />
-        <meta key="twitter:image" name="twitter:image" content="/logo192.png" />
+        <meta key="twitter:image" name="twitter:image" content="https://swap.dotoracle.network/cover.jpeg" />
         <meta key="twitter:creator" name="twitter:creator" content="@DotOracle" />
         <meta key="og:type" property="og:type" content="website" />
         <meta key="og:site_name" property="og:site_name" content="DTO Pegged Swap" />
         <meta key="og:url" property="og:url" content="https://swap.dotoracle.network" />
-        <meta key="og:image" property="og:image" content="/logo512.png" />
+        <meta key="og:image" property="og:image" content="https://swap.dotoracle.network/cover.jpeg" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="627" />
         <meta
           key="og:description"
           property="og:description"
